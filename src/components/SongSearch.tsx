@@ -169,46 +169,51 @@ export default function SongSearch({ user }: SongSearchProps) {
           </button>
         </div>
         {/* Pills row and popover button */}
-        <div className="flex items-center gap-2 mt-2">
-          {/* Show selected pills in a row */}
-          {selectedMoodTags.map(label => {
-            const opt = moodTagOptions.find(o => o.label === label)
-            return opt ? (
-              <Pill
-                key={label}
-                label={label}
-                color={opt.color}
-                selected
-                onClick={() => setSelectedMoodTags(selectedMoodTags.filter(t => t !== label))}
-              />
-            ) : null
-          })}
-          {selectedLanguageTags.map(label => {
-            const opt = languageTagOptions.find(o => o.label === label)
-            return opt ? (
-              <Pill
-                key={label}
-                label={label}
-                color={opt.color}
-                selected
-                onClick={() => setSelectedLanguageTags(selectedLanguageTags.filter(t => t !== label))}
-              />
-            ) : null
-          })}
-          {difficulty && (() => {
-            const opt = difficultyOptions.find(o => o.value === difficulty)
-            return opt ? (
-              <Pill
-                key={opt.value}
-                label={opt.label}
-                color={opt.color}
-                selected
-                onClick={() => setDifficulty(null)}
-              />
-            ) : null
-          })()}
-          {newOnly && <Pill label="New only" color="purple" selected onClick={() => setNewOnly(false)} />}
-          <FilterPopoverButton onClick={() => setFilterOpen(v => !v)} />
+        <div className="relative mt-2">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pr-12" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {/* Show selected pills in a row */}
+            {selectedMoodTags.map(label => {
+              const opt = moodTagOptions.find(o => o.label === label)
+              return opt ? (
+                <Pill
+                  key={label}
+                  label={label}
+                  color={opt.color}
+                  selected
+                  onClick={() => setSelectedMoodTags(selectedMoodTags.filter(t => t !== label))}
+                />
+              ) : null
+            })}
+            {selectedLanguageTags.map(label => {
+              const opt = languageTagOptions.find(o => o.label === label)
+              return opt ? (
+                <Pill
+                  key={label}
+                  label={label}
+                  color={opt.color}
+                  selected
+                  onClick={() => setSelectedLanguageTags(selectedLanguageTags.filter(t => t !== label))}
+                />
+              ) : null
+            })}
+            {difficulty && (() => {
+              const opt = difficultyOptions.find(o => o.value === difficulty)
+              return opt ? (
+                <Pill
+                  key={opt.value}
+                  label={opt.label}
+                  color={opt.color}
+                  selected
+                  onClick={() => setDifficulty(null)}
+                />
+              ) : null
+            })()}
+            {newOnly && <Pill label="New only" color="purple" selected onClick={() => setNewOnly(false)} />}
+          </div>
+          {/* Arrow always visible, absolutely positioned at end */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-900">
+            <FilterPopoverButton onClick={() => setFilterOpen(v => !v)} />
+          </div>
         </div>
         {/* Popover for filters */}
         {filterOpen && (
