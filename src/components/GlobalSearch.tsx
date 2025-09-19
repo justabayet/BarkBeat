@@ -88,21 +88,15 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
   useEffect(() => {
     if (!hasMore || loading) return;
     const handleScroll = () => {
-      const el = listRef.current;
-      if (!el) return;
-      if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) {
-        // Near bottom, load more
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.body.offsetHeight - 200;
+      if (scrollPosition >= threshold) {
         searchSpotify({ append: true });
       }
     };
-    const el = listRef.current;
-    if (el) {
-      el.addEventListener('scroll', handleScroll);
-    }
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      if (el) {
-        el.removeEventListener('scroll', handleScroll);
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [hasMore, loading, results]);
 
@@ -125,7 +119,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
           {loading ? 'Searching...' : 'Search'}
         </button>
       </div>
-      <div ref={listRef} className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
+  <div ref={listRef} className="flex flex-col gap-2">
         {results.map(track => (
           <div key={track.id} className="flex items-center gap-4 bg-white/5 rounded-lg px-3 py-2 min-h-[72px]">
             {track.album?.images?.[0]?.url && (
