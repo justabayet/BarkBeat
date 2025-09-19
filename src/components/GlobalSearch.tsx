@@ -133,16 +133,18 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
     }, [hasMore, loading, results, searchSpotify]);
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 p-4">
             <div className="flex items-center space-x-4 sticky top-6">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
                     type="text"
                     placeholder="Search Spotify for songs or artists..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    onKeyPress={e => e.key === 'Enter' && searchSpotify()}
-                    className="w-full pl-4 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                    onKeyDown={e => e.key === 'Enter' && searchSpotify()}
+                    className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
                 />
+
                 <button
                     onClick={() => searchSpotify()}
                     disabled={loading}
@@ -152,9 +154,9 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                         <Loader size={22} /> : <Search size={22} />}
                 </button>
             </div>
-            <div ref={listRef} className="flex flex-col gap-8 px-2">
+            <div ref={listRef} className="flex flex-col gap-8">
                 {results.map(track => (
-                    <div key={track.id} className="flex items-center gap-4 rounded-lg px-3 py-2 min-h-[72px]">
+                    <div key={track.id} className="flex items-center gap-4 rounded-lg py-2 min-h-[72px]">
                         {track.album?.images?.[0]?.url && (
                             <Image
                                 src={track.album.images[0].url}

@@ -5,7 +5,7 @@ import { useState } from 'react'
 import Pill from './Pill'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
-import { Search, Plus, Star } from 'lucide-react'
+import { Search, Plus, Star, Loader } from 'lucide-react'
 import RatingModal from './RatingModal'
 import type { Song, UserSong } from '@/lib/typesInfered'
 
@@ -144,24 +144,24 @@ export default function SongSearch({ user }: SongSearchProps) {
   return (
     <div className="space-y-6 min-h-screen p-4">
       {/* Search bar */}
-      <div className="flex flex-col sm:flex-row gap-3 w-full">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search songs by title or artist..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && searchSongs()}
-            className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
-          />
-        </div>
+      <div className="flex items-center space-x-4 sticky top-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+        <input
+          type="text"
+          placeholder="Search Spotify for songs or artists..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && searchSongs()}
+          className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
+        />
+
         <button
-          onClick={searchSongs}
+          onClick={() => searchSongs()}
           disabled={loading}
-          className="w-full sm:w-auto px-6 py-3 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 rounded-lg text-white font-semibold transition-colors shadow"
+          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
         >
-          {loading ? 'Searching...' : 'Search'}
+          {loading ?
+            <Loader size={22} /> : <Search size={22} />}
         </button>
       </div>
 
