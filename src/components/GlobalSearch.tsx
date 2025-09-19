@@ -108,8 +108,8 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
     }, [hasMore, loading, results]);
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center space-x-4 sticky top-0">
+        <div className="space-y-10">
+            <div className="flex items-center space-x-4 sticky top-6">
                 <input
                     type="text"
                     placeholder="Search Spotify for songs or artists..."
@@ -127,9 +127,9 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                         <Loader size={22} /> : <Search size={22} />}
                 </button>
             </div>
-            <div ref={listRef} className="flex flex-col gap-2">
+            <div ref={listRef} className="flex flex-col gap-8 px-2">
                 {results.map(track => (
-                    <div key={track.id} className="flex items-center gap-4 bg-white/5 rounded-lg px-3 py-2 min-h-[72px]">
+                    <div key={track.id} className="flex items-center gap-4 rounded-lg px-3 py-2 min-h-[72px]">
                         {track.album?.images?.[0]?.url && (
                             <Image
                                 src={track.album.images[0].url}
