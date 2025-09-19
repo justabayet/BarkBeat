@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import FilterPopoverButton from './FilterPopoverButton'
 import Pill from './Pill'
 import type { User } from '@supabase/supabase-js'
@@ -28,6 +28,22 @@ export default function SongSearch({ user }: SongSearchProps) {
   // Popover state
   const [filterOpen, setFilterOpen] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
+  const popoverBtnRef = useRef<HTMLDivElement>(null)
+
+  // Close popover on outside click
+  useEffect(() => {
+    if (!filterOpen) return;
+    function handleClick(e: MouseEvent) {
+
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node) &&
+        popoverBtnRef.current && !popoverBtnRef.current.contains(e.target as Node)) {
+        console.log('out of popover', filterOpen)
+        setFilterOpen(false);
+      }
+    }
+    document.addEventListener('mouseup', handleClick);
+    return () => document.removeEventListener('mouseup', handleClick);
+  }, [filterOpen]);
   // Example tag options (replace with dynamic fetch if needed)
   const moodTagOptions = [
     { label: 'Party', color: 'pink' },
@@ -39,13 +55,20 @@ export default function SongSearch({ user }: SongSearchProps) {
     { label: 'English', color: 'purple' },
     { label: 'French', color: 'green' },
     { label: 'Spanish', color: 'yellow' },
-    { label: 'Other', color: 'slate' }
+    { label: 'Japanese', color: 'red' },
+    { label: 'Korean', color: 'pink' }
   ]
   const difficultyOptions = [
     { label: 'Easy', value: 'easy', color: 'green' },
     { label: 'Intermediate', value: 'intermediate', color: 'yellow' },
     { label: 'Hard', value: 'hard', color: 'red' }
   ]
+
+  const newSongsOptions = {
+    key: "New Songs",
+    label: "New Songs",
+    color: "blue"
+  }
 
   const searchSongs = async () => {
     setLoading(true)
@@ -169,8 +192,8 @@ export default function SongSearch({ user }: SongSearchProps) {
           </button>
         </div>
         {/* Pills row and popover button */}
-        <div className="relative mt-2">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pr-12" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="relative mt-1">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pr-12" style={{ WebkitOverflowScrolling: 'touch', width: '95%' }}>
             {/* Show selected pills in a row */}
             {selectedMoodTags.map(label => {
               const opt = moodTagOptions.find(o => o.label === label)
@@ -208,19 +231,21 @@ export default function SongSearch({ user }: SongSearchProps) {
                 />
               ) : null
             })()}
-            {newOnly && <Pill label="New only" color="purple" selected onClick={() => setNewOnly(false)} />}
+            {newOnly && <Pill label={newSongsOptions.label} color={newSongsOptions.color} selected onClick={() => setNewOnly(false)} />}
           </div>
           {/* Arrow always visible, absolutely positioned at end */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-slate-900">
-            <FilterPopoverButton onClick={() => setFilterOpen(v => !v)} />
+          <div className="absolute mt-2 right-0 top-1 -translate-y-1/2 z-10" ref={popoverBtnRef}>
+            <FilterPopoverButton onClick={() => {
+              setFilterOpen(v => !v)
+            }} />
           </div>
         </div>
         {/* Popover for filters */}
         {filterOpen && (
-          <div ref={popoverRef} className="absolute z-50 mt-25 left-0 w-full max-w-xl bg-slate-900 border border-slate-700 rounded-xl shadow-lg p-6 flex flex-wrap gap-6">
+          <div ref={popoverRef} className="absolute z-50 mt-25 left-1/2 -translate-x-1/2 w-full max-w-sm bg-slate-900 border border-slate-700 rounded-xl shadow-lg p-6 flex flex-wrap gap-6">
             {/* Mood tags */}
             <div>
-              <label className="block text-xs font-semibold mb-1 text-slate-200">Mood Tags</label>
+              <label className="block text-xs font-semibold mb-1 text-slate-200">Mood</label>
               <div className="flex flex-wrap gap-2">
                 {moodTagOptions.map(opt => (
                   <Pill
@@ -237,7 +262,7 @@ export default function SongSearch({ user }: SongSearchProps) {
             </div>
             {/* Language tags */}
             <div>
-              <label className="block text-xs font-semibold mb-1 text-slate-200">Language Tags</label>
+              <label className="block text-xs font-semibold mb-1 text-slate-200">Language</label>
               <div className="flex flex-wrap gap-2">
                 {languageTagOptions.map(opt => (
                   <Pill
@@ -268,20 +293,18 @@ export default function SongSearch({ user }: SongSearchProps) {
               </div>
             </div>
             {/* New only */}
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={newOnly}
-                onChange={e => setNewOnly(e.target.checked)}
-                id="newOnly"
-                className="accent-purple-600"
-              />
-              <label htmlFor="newOnly" className="text-xs font-semibold text-slate-200">New songs only</label>
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-slate-200">Miscellanous</label>
+              <div className="flex flex-wrap gap-2">
+                <Pill
+                  key={newSongsOptions.key}
+                  label={newSongsOptions.label}
+                  color={newSongsOptions.color}
+                  selected={newOnly}
+                  onClick={() => setNewOnly(v => !v)}
+                />
+              </div>
             </div>
-            <button
-              className="ml-auto mt-4 px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors"
-              onClick={() => setFilterOpen(false)}
-            >Close</button>
           </div>
         )}
       </div>

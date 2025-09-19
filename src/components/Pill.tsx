@@ -91,7 +91,7 @@ const Pill: React.FC<PillProps> = ({ label, selected, onClick, className, color 
         <button
             type="button"
             onClick={onClick}
-            className={`px-3 py-1 rounded-full border text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-${color}-400 shadow-sm 
+            className={`px-3 py-1 rounded-full border text-xs font-semibold whitespace-nowrap transition-colors focus:outline-none focus:ring-2 focus:ring-${color}-400 shadow-sm 
         ${selected ? `${c.bgSelected} ${c.textSelected} ${c.borderSelected}` : `${c.bg} ${c.text} ${c.border} hover:${c.bgSelected}`} 
         ${className || ''}`}
         >
