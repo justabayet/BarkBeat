@@ -109,7 +109,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 sticky top-18">
                 <input
                     type="text"
                     placeholder="Search Spotify for songs or artists..."
