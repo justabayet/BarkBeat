@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import SongSearch from './SongSearch'
 import SessionManager from './SessionManager'
 import GlobalSearch from './GlobalSearch'
-import { Music, Users, Search, LogOut, Globe } from 'lucide-react'
+import { Music, Users, Search, LogOut, Globe, Play, User as UserIcon } from 'lucide-react'
 import type { Profile, Song, UserSong } from '@/lib/typesInfered'
 
 interface DashboardProps {
@@ -42,7 +42,7 @@ export default function Dashboard({ user }: DashboardProps) {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-  setUserSongs((data || []).filter((us) => us.songs !== null) as (UserSong & { songs: Song })[])
+      setUserSongs((data || []).filter((us) => us.songs !== null) as (UserSong & { songs: Song })[])
     }
 
     loadProfile()
@@ -60,8 +60,8 @@ export default function Dashboard({ user }: DashboardProps) {
       <nav className="hidden md:block bg-gradient-to-r from-gray-900/80 via-gray-950/80 to-black/80 backdrop-blur-md mt-4 rounded-xl border border-gray-800/70 shadow-lg sticky top-0 z-30">
         <div className="max-w-2xl mx-auto flex gap-4 justify-center py-2">
           {[
-            { id: 'search', label: 'Search Songs', icon: Search },
-            { id: 'global', label: 'Global Search', icon: Globe },
+            { id: 'search', label: 'Session', icon: Play },
+            { id: 'global', label: 'Search', icon: Search },
             { id: 'sessions', label: 'Sessions', icon: Users },
             { id: 'library', label: 'My Library', icon: Music },
             { id: 'user', label: 'User', icon: LogOut },
@@ -83,11 +83,11 @@ export default function Dashboard({ user }: DashboardProps) {
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-r from-gray-900/90 via-gray-950/90 to-black/90 backdrop-blur-md border-t border-gray-800/80 flex md:hidden justify-around py-2 shadow-t-xl">
         {[
-          { id: 'search', label: 'Search', icon: Search },
-          { id: 'global', label: 'Global', icon: Globe },
+          { id: 'search', label: 'Search', icon: Play },
+          { id: 'global', label: 'Global', icon: Search },
           { id: 'sessions', label: 'Sessions', icon: Users },
           { id: 'library', label: 'Library', icon: Music },
-          { id: 'user', label: 'User', icon: LogOut },
+          { id: 'user', label: 'User', icon: UserIcon },
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -104,7 +104,7 @@ export default function Dashboard({ user }: DashboardProps) {
         ))}
       </nav>
 
-      <div className="min-h-screen text-gray-100 bg-transparent w-full">
+      <div className="text-gray-100 bg-transparent w-full px-2 sm:px-4 md:px-8">
         <main className="max-w-2xl mx-auto w-full px-0 sm:px-2 py-6 pb-20 md:pb-6">
           {activeTab === 'search' && <SongSearch user={user} />}
           {activeTab === 'global' && <GlobalSearch user={user} />}
