@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import SongSearch from './SongSearch'
 import SessionManager from './SessionManager'
 import GlobalSearch from './GlobalSearch'
-import { Music, Users, Search, LogOut, Globe, Play, User as UserIcon } from 'lucide-react'
+import { Music, Users, Search, LogOut, Play, User as UserIcon } from 'lucide-react'
 import type { Profile, Song, UserSong } from '@/lib/typesInfered'
 
 interface DashboardProps {
