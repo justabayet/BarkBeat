@@ -46,7 +46,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
       .eq('host_id', user.id)
       .eq('is_active', true)
       .order('created_at', { ascending: false })
-    
+
     setSessions(data || [])
   }
 
@@ -56,13 +56,13 @@ export default function SessionManager({ user }: SessionManagerProps) {
       .select('*')
       .eq('created_by', user.id)
       .order('created_at', { ascending: false })
-    
+
     setMockProfiles(data || [])
   }
 
   const createSession = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const { data, error } = await supabase
       .from('karaoke_sessions')
       .insert([{
@@ -71,7 +71,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
       }])
       .select()
       .single()
-    
+
     if (!error && data) {
       setSessions([data, ...sessions])
       setActiveSession(data)
@@ -82,7 +82,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
 
   const createMockProfile = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const { data, error } = await supabase
       .from('mock_profiles')
       .insert([{
@@ -91,7 +91,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
       } as MockProfile])
       .select()
       .single()
-    
+
     if (!error && data) {
       setMockProfiles([data, ...mockProfiles])
       setNewMockName('')
@@ -109,7 +109,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
     const { error } = await supabase
       .from('session_participants')
       .insert([insertData])
-    
+
     if (!error) {
       loadSessionParticipants()
     }
@@ -126,7 +126,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
         mock_profiles (id, name, avatar_url)
       `)
       .eq('session_id', activeSession.id)
-    
+
     const participantList: SessionParticipant[] = (data || []).map(p => {
       if (p.user_id && p.profiles) {
         return {
@@ -145,7 +145,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
       }
       return null
     }).filter(Boolean) as SessionParticipant[]
-    
+
     setParticipants(participantList)
   }
 
@@ -154,7 +154,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
 
     // Get all user songs for participants (only real users have ratings)
     const userIds = participants.filter(p => p.type === 'user').map(p => p.id)
-    
+
     if (userIds.length === 0) {
       setRecommendations([])
       return
@@ -167,16 +167,16 @@ export default function SessionManager({ user }: SessionManagerProps) {
         songs (*)
       `)
       .in('user_id', userIds)
-    
+
     // Group songs by song_id and calculate average difficulty and match score
     const songGroups = new Map<string, {
       song: Song
       ratings: UserSong[]
     }>()
-    
+
     userSongs?.forEach(userSong => {
       if (!userSong.songs) return
-      
+
       const songId = userSong.songs.id
       if (!songGroups.has(songId)) {
         songGroups.set(songId, {
@@ -186,13 +186,13 @@ export default function SessionManager({ user }: SessionManagerProps) {
       }
       songGroups.get(songId)!.ratings.push(userSong)
     })
-    
+
     // Calculate recommendations
     const recs = Array.from(songGroups.entries())
       .map(([, { song, ratings }]) => {
         const avgDifficulty = ratings.reduce((sum, r) => sum + (r.difficulty_rating || 5), 0) / ratings.length
         const matchScore = ratings.length / userIds.length // How many participants know this song
-        
+
         return {
           ...song,
           avgDifficulty,
@@ -201,7 +201,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
       })
       .sort((a, b) => b.matchScore - a.matchScore || Math.abs(5 - a.avgDifficulty) - Math.abs(5 - b.avgDifficulty))
       .slice(0, 10)
-    
+
     setRecommendations(recs)
   }
 
@@ -212,7 +212,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
       .from('karaoke_sessions')
       .update({ is_active: false })
       .eq('id', activeSession.id)
-    
+
     setActiveSession(null)
     setParticipants([])
     setRecommendations([])
@@ -285,7 +285,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
                 End Session
               </button>
             </div>
-            
+
             <div className="flex justify-between items-center mb-4">
               <h4 className="font-semibold">Participants ({participants.length})</h4>
               <button
@@ -296,7 +296,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
                 <span>Add</span>
               </button>
             </div>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
               {participants.map((participant) => (
                 <div key={participant.id} className="bg-white/5 rounded-lg p-3 text-center">
@@ -371,7 +371,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
                 <X size={24} />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <h4 className="font-medium mb-2">Create Mock Profile</h4>
@@ -392,7 +392,7 @@ export default function SessionManager({ user }: SessionManagerProps) {
                   </button>
                 </form>
               </div>
-              
+
               {mockProfiles.length > 0 && (
                 <div>
                   <h4 className="font-medium mb-2">Add Existing Mock Profiles</h4>

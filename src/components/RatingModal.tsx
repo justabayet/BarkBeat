@@ -40,7 +40,7 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Rate &quot;{song.title}&quot;</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
@@ -77,11 +77,10 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag, moodTags, setMoodTags)}
-                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                    moodTags.includes(tag)
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${moodTags.includes(tag)
                       ? 'bg-purple-600 text-white'
                       : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                  }`}
+                    }`}
                 >
                   {tag}
                 </button>
@@ -97,11 +96,10 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag, languageTags, setLanguageTags)}
-                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                    languageTags.includes(tag)
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${languageTags.includes(tag)
                       ? 'bg-blue-600 text-white'
                       : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                  }`}
+                    }`}
                 >
                   {tag}
                 </button>
@@ -113,11 +111,10 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
             <button
               type="button"
               onClick={() => setIsFavorite(!isFavorite)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
-                isFavorite
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${isFavorite
                   ? 'bg-yellow-600/30 text-yellow-300'
                   : 'bg-white/10 text-gray-300 hover:bg-white/20'
-              }`}
+                }`}
             >
               <Star size={16} className={isFavorite ? 'fill-current' : ''} />
               <span>Add to Favorites</span>

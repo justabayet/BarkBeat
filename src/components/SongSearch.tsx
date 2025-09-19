@@ -21,7 +21,7 @@ export default function SongSearch({ user }: SongSearchProps) {
 
   const searchSongs = async () => {
     if (!searchTerm.trim()) return
-    
+
     setLoading(true)
     try {
       const { data } = await supabase
@@ -33,7 +33,7 @@ export default function SongSearch({ user }: SongSearchProps) {
         .or(`title.ilike.%${searchTerm}%,artist.ilike.%${searchTerm}%`)
         .eq('user_songs.user_id', user.id)
         .limit(20)
-      
+
       setSongs(data || [])
     } catch (error) {
       console.error('Search error:', error)
@@ -50,7 +50,7 @@ export default function SongSearch({ user }: SongSearchProps) {
         song_id: song.id,
         times_performed: 0
       }])
-    
+
     if (!error) {
       setSelectedSong(song)
       setShowRatingModal(true)
