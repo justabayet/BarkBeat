@@ -13,7 +13,7 @@ body {
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
   width: 8px;
 }
 
@@ -28,7 +28,7 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(147, 51, 234, 0.7);
-}
+} */
 
 /* Range input styling */
 input[type="range"] {

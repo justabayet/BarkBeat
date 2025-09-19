@@ -39,7 +39,6 @@ export default function SessionManager({ user }: SessionManagerProps) {
       generateRecommendations()
     }
   }, [activeSession, participants])
-
   const loadSessions = async () => {
     const { data } = await supabase
       .from('karaoke_sessions')

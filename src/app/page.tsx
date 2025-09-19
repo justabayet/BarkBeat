@@ -28,16 +28,26 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-b-2 border-purple-500"></div>
       </div>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      {!user ? <AuthComponent /> : <Dashboard user={user} />}
-    </main>
+    <section className="w-full flex flex-col items-center justify-center gap-6 py-6">
+      {!user ? (
+        <>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Welcome to BarkBeat!</h2>
+          <p className="text-base sm:text-lg text-slate-600 max-w-xs sm:max-w-md mx-auto mb-4">
+            Discover music and enjoy karaoke with friends. Start searching for your favorite songs or artists and let the fun begin!
+          </p>
+          <AuthComponent />
+        </>
+      ) : (
+        <Dashboard user={user} />
+      )}
+    </section>
   )
 }
 

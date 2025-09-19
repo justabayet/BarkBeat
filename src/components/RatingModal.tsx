@@ -3,7 +3,7 @@
 
 import { useState } from 'react'
 import { X, Star } from 'lucide-react'
-import type { Song } from '@/lib/types'
+import type { Song } from '@/lib/typesInfered'
 
 interface RatingModalProps {
   song: Song
@@ -40,7 +40,7 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Rate &quot;{song.title}&quot;</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
