@@ -54,9 +54,9 @@ export default function Dashboard({ user }: DashboardProps) {
   }
 
   return (
-    <div className="min-h-screen text-slate-900 bg-transparent">
-      <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-2 py-3 sticky top-0 z-20 rounded-b-xl shadow-sm">
-        <div className="flex items-center justify-between max-w-2xl mx-auto">
+    <>
+      <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-2 py-3 sticky top-0 z-30 rounded-b-xl shadow-sm w-full">
+        <div className="flex items-center justify-between w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-bold text-purple-700">🎤 BarkBeat</h1>
             <span className="text-xs text-slate-500 hidden sm:inline">Welcome, {profile?.name || user.email}</span>
@@ -71,8 +71,9 @@ export default function Dashboard({ user }: DashboardProps) {
         </div>
       </header>
 
-      {/* Bottom nav for mobile, top nav for md+ */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 border-t border-slate-200 flex md:hidden justify-around py-2 shadow-t-xl">
+      <div className="min-h-screen text-slate-900 bg-transparent w-full">
+        {/* Bottom nav for mobile, top nav for md+ */}
+        <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/90 border-t border-slate-200 flex md:hidden justify-around py-2 shadow-t-xl">
         {[
           { id: 'search', label: 'Search', icon: Search },
           { id: 'global', label: 'Global', icon: Globe },
@@ -155,6 +156,7 @@ export default function Dashboard({ user }: DashboardProps) {
           </div>
         )}
       </main>
-    </div>
+      </div>
+    </>
   )
 }

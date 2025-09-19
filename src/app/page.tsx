@@ -35,7 +35,7 @@ export default function Home() {
   }
 
   return (
-    <section className="w-full flex flex-col items-center justify-center gap-6 py-6">
+    <section className="w-full flex flex-col items-center justify-center gap-6">
       {!user ? (
         <>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Welcome to BarkBeat!</h2>
