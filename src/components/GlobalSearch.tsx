@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { v5 as uuidv5 } from 'uuid';
 import { Plus } from 'lucide-react';
 import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
@@ -40,8 +41,8 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
       setResults(prev => {
         if (opts?.append) {
           // Filter out tracks with duplicate IDs
-          const existingIds = new Set(prev.map(t => t.id));
-          const filtered = newResults.filter(t => !existingIds.has(t.id));
+          const existingIds = new Set(prev.map((t: SpotifyTrack) => t.id));
+          const filtered = newResults.filter((t: SpotifyTrack) => !existingIds.has(t.id));
           return [...prev, ...filtered];
         } else {
           return newResults;
@@ -60,10 +61,16 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
 
   const addToLibrary = async (track: SpotifyTrack) => {
     // Insert into songs table if not exists, then into user_songs
+    // The songs table expects a UUID for id, but Spotify track.id is not a UUID.
+    // Use a surrogate UUID by hashing the Spotify id, or store the Spotify id in a separate column.
+    // Here, we use a deterministic UUID v5 from the Spotify id string.
+    const NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'; // DNS namespace
+    const songId = uuidv5(track.id, NAMESPACE);
     const { data: song, error: songError } = await supabase
       .from('songs')
       .upsert({
-        id: track.id,
+        id: songId,
+        spotify_id: track.id,
         title: track.name,
         artist: track.artists.map(a => a.name).join(', '),
         language: '', // Optional: set if available
@@ -78,7 +85,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
       .from('user_songs')
       .insert({
         user_id: user.id,
-        song_id: track.id,
+        song_id: songId,
         times_performed: 0
       });
     if (!userSongError) setAddedId(track.id);
