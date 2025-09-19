@@ -164,13 +164,13 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                         <button
                             onClick={() => addToLibrary(track)}
                             disabled={addedId === track.id}
-                            className="flex items-center justify-center w-10 h-10 bg-green-600/20 hover:bg-green-600/30 rounded-full transition-colors disabled:opacity-50 text-lg ml-2"
+                            className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700 hover:from-purple-700 hover:to-purple-800 hover:shadow-lg rounded-full transition-all duration-150 disabled:opacity-60 text-lg ml-2 border border-purple-800/40"
                             aria-label={addedId === track.id ? 'Added' : 'Add'}
                         >
                             {addedId === track.id ? (
-                                <span className="text-green-400 text-2xl font-bold">&#10003;</span>
+                                <span className="text-purple-200 text-2xl font-bold">&#10003;</span>
                             ) : (
-                                <Plus size={24} />
+                                <Plus size={24} className="text-white" />
                             )}
                         </button>
                     </div>
