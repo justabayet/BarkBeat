@@ -22,7 +22,7 @@ const LANGUAGE_TAGS = ['english', 'spanish', 'french', 'japanese', 'korean', 'ma
 export default function RatingModal({ song, onSubmit, onClose }: RatingModalProps) {
   const [difficulty, setDifficulty] = useState(5)
   const [moodTags, setMoodTags] = useState<string[]>([])
-  const [languageTags, setLanguageTags] = useState<string[]>([song.language])
+  const [languageTags, setLanguageTags] = useState<string[]>(song.language != null ? [song.language] : [])
   const [isFavorite, setIsFavorite] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -78,8 +78,8 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
                   type="button"
                   onClick={() => toggleTag(tag, moodTags, setMoodTags)}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${moodTags.includes(tag)
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                 >
                   {tag}
@@ -97,8 +97,8 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
                   type="button"
                   onClick={() => toggleTag(tag, languageTags, setLanguageTags)}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${languageTags.includes(tag)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                 >
                   {tag}
@@ -112,8 +112,8 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
               type="button"
               onClick={() => setIsFavorite(!isFavorite)}
               className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${isFavorite
-                  ? 'bg-yellow-600/30 text-yellow-300'
-                  : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                ? 'bg-yellow-600/30 text-yellow-300'
+                : 'bg-white/10 text-gray-300 hover:bg-white/20'
                 }`}
             >
               <Star size={16} className={isFavorite ? 'fill-current' : ''} />
