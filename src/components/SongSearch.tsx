@@ -173,17 +173,41 @@ export default function SongSearch({ user }: SongSearchProps) {
           {/* Show selected pills in a row */}
           {selectedMoodTags.map(label => {
             const opt = moodTagOptions.find(o => o.label === label)
-            return opt ? <Pill key={label} label={label} color={opt.color} selected onClick={() => { }} /> : null
+            return opt ? (
+              <Pill
+                key={label}
+                label={label}
+                color={opt.color}
+                selected
+                onClick={() => setSelectedMoodTags(selectedMoodTags.filter(t => t !== label))}
+              />
+            ) : null
           })}
           {selectedLanguageTags.map(label => {
             const opt = languageTagOptions.find(o => o.label === label)
-            return opt ? <Pill key={label} label={label} color={opt.color} selected onClick={() => { }} /> : null
+            return opt ? (
+              <Pill
+                key={label}
+                label={label}
+                color={opt.color}
+                selected
+                onClick={() => setSelectedLanguageTags(selectedLanguageTags.filter(t => t !== label))}
+              />
+            ) : null
           })}
           {difficulty && (() => {
             const opt = difficultyOptions.find(o => o.value === difficulty)
-            return opt ? <Pill key={opt.value} label={opt.label} color={opt.color} selected onClick={() => { }} /> : null
+            return opt ? (
+              <Pill
+                key={opt.value}
+                label={opt.label}
+                color={opt.color}
+                selected
+                onClick={() => setDifficulty(null)}
+              />
+            ) : null
           })()}
-          {newOnly && <Pill label="New only" color="purple" selected onClick={() => { }} />}
+          {newOnly && <Pill label="New only" color="purple" selected onClick={() => setNewOnly(false)} />}
           <FilterPopoverButton onClick={() => setFilterOpen(v => !v)} />
         </div>
         {/* Popover for filters */}
