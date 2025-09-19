@@ -46,14 +46,21 @@ export default function SongSearch({ user }: SongSearchProps) {
   const searchSongs = async () => {
     setLoading(true)
     try {
+      const filters = [`user_songs.user_id.eq.${user.id}`]
+      if (searchTerm.trim()) {
+        filters.push(`title.ilike.%${searchTerm}%`)
+        filters.push(`artist.ilike.%${searchTerm}%`)
+      }
+      // Build the or filter for search term if present
       let query = supabase
         .from('songs')
-        .select(`*, user_songs!inner (*)`)
-        .eq('user_songs.user_id', user.id)
-
-      // Search term
+        .select('*, user_songs!inner(*)')
       if (searchTerm.trim()) {
-        query = query.or(`title.ilike.%${searchTerm}%,artist.ilike.%${searchTerm}%`)
+        query = query.or(
+          `user_songs.user_id.eq.${user.id},title.ilike.%${searchTerm}%,artist.ilike.%${searchTerm}%`
+        )
+      } else {
+        query = query.eq('user_songs.user_id', user.id)
       }
 
       // Mood tags
