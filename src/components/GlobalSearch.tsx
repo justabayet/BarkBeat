@@ -4,6 +4,7 @@ import { Loader, Plus, Search } from 'lucide-react';
 import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { useCallback } from 'react';
 
 interface GlobalSearchProps {
     user: User;
@@ -23,9 +24,26 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
     const [addedId, setAddedId] = useState<string | null>(null);
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [userLibrary, setUserLibrary] = useState<Set<string>>(new Set());
     const listRef = useRef<HTMLDivElement>(null);
 
-    const searchSpotify = async (opts?: { append?: boolean; customTerm?: string }) => {
+    // Fetch user's library of Spotify song IDs on mount
+    useEffect(() => {
+        type UserSongWithSpotify = { songs: { spotify_id: string } | null };
+        const fetchLibrary = async () => {
+            const { data, error } = await supabase
+                .from('user_songs')
+                .select('song_id, songs(spotify_id)')
+                .eq('user_id', user.id);
+            if (!error && data) {
+                const ids = (data as UserSongWithSpotify[]).map(row => row.songs?.spotify_id).filter((id): id is string => Boolean(id));
+                setUserLibrary(new Set(ids));
+            }
+        };
+        fetchLibrary();
+    }, [user.id]);
+
+    const searchSpotify = useCallback(async (opts?: { append?: boolean; customTerm?: string }) => {
         const term = opts?.customTerm ?? searchTerm;
         if (!term.trim()) return;
         setLoading(true);
@@ -51,13 +69,13 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
             setOffset(prev => (opts?.append ? prev + newResults.length : newResults.length));
             setHasMore((data.tracks?.next != null) && newResults.length > 0);
             if (opts?.customTerm) setSearchTerm(opts.customTerm);
-        } catch (e) {
+        } catch {
             setResults([]);
             setHasMore(false);
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchTerm, offset]);
 
     const addToLibrary = async (track: SpotifyTrack) => {
         // Insert into songs table if not exists, then into user_songs
@@ -66,7 +84,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
         // Here, we use a deterministic UUID v5 from the Spotify id string.
         const NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'; // DNS namespace
         const songId = uuidv5(track.id, NAMESPACE);
-        const { data: song, error: songError } = await supabase
+        const { error: songError } = await supabase
             .from('songs')
             .upsert({
                 id: songId,
@@ -88,7 +106,14 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                 song_id: songId,
                 times_performed: 0
             });
-        if (!userSongError) setAddedId(track.id);
+        if (!userSongError) {
+            setAddedId(track.id)
+            setUserLibrary((prev) => {
+                const newLibrary = new Set(prev);
+                newLibrary.add(track.id);
+                return newLibrary;
+            });
+        };
     };
 
     // Infinite scroll effect
@@ -105,7 +130,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [hasMore, loading, results]);
+    }, [hasMore, loading, results, searchSpotify]);
 
     return (
         <div className="space-y-10">
@@ -163,11 +188,11 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                         </div>
                         <button
                             onClick={() => addToLibrary(track)}
-                            disabled={addedId === track.id}
+                            disabled={addedId === track.id || userLibrary.has(track.id)}
                             className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700 hover:from-purple-700 hover:to-purple-800 hover:shadow-lg rounded-full transition-all duration-150 disabled:opacity-60 text-lg ml-2 border border-purple-800/40"
-                            aria-label={addedId === track.id ? 'Added' : 'Add'}
+                            aria-label={addedId === track.id || userLibrary.has(track.id) ? 'Added' : 'Add'}
                         >
-                            {addedId === track.id ? (
+                            {(addedId === track.id || userLibrary.has(track.id)) ? (
                                 <span className="text-purple-200 text-2xl font-bold">&#10003;</span>
                             ) : (
                                 <Plus size={24} className="text-white" />
