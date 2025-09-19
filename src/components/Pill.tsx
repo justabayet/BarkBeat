@@ -6,7 +6,7 @@ interface PillProps {
     selected: boolean;
     onClick?: () => void;
     className?: string;
-    color?: string; // tailwind color name, e.g. 'purple', 'blue', 'green', etc.
+    color?: string;
 }
 
 export const pillConfig = {
@@ -60,7 +60,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     purple: {
         base: 'text-purple-400',
         border: 'border-purple-400',
-        text: 'text-purple-400',
+        text: 'text-purple-300',
         bg: 'bg-purple-950',
         bgSelected: 'bg-purple-700',
         textSelected: 'text-white',
@@ -69,7 +69,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     blue: {
         base: 'text-blue-400',
         border: 'border-blue-400',
-        text: 'text-blue-400',
+        text: 'text-blue-300',
         bg: 'bg-blue-950',
         bgSelected: 'bg-blue-700',
         textSelected: 'text-white',
@@ -78,7 +78,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     green: {
         base: 'text-green-400',
         border: 'border-green-400',
-        text: 'text-green-400',
+        text: 'text-green-300',
         bg: 'bg-green-950',
         bgSelected: 'bg-green-700',
         textSelected: 'text-white',
@@ -87,7 +87,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     yellow: {
         base: 'text-yellow-400',
         border: 'border-yellow-400',
-        text: 'text-yellow-400',
+        text: 'text-yellow-200',
         bg: 'bg-yellow-950',
         bgSelected: 'bg-yellow-600',
         textSelected: 'text-white',
@@ -96,7 +96,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     red: {
         base: 'text-red-400',
         border: 'border-red-400',
-        text: 'text-red-400',
+        text: 'text-red-300',
         bg: 'bg-red-950',
         bgSelected: 'bg-red-700',
         textSelected: 'text-white',
@@ -105,7 +105,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     pink: {
         base: 'text-pink-400',
         border: 'border-pink-400',
-        text: 'text-pink-400',
+        text: 'text-pink-300',
         bg: 'bg-pink-950',
         bgSelected: 'bg-pink-700',
         textSelected: 'text-white',
@@ -114,7 +114,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     orange: {
         base: 'text-orange-400',
         border: 'border-orange-400',
-        text: 'text-orange-400',
+        text: 'text-orange-300',
         bg: 'bg-orange-950',
         bgSelected: 'bg-orange-700',
         textSelected: 'text-white',
@@ -123,7 +123,7 @@ const colorMap: Record<string, { base: string; border: string; text: string; bg:
     slate: {
         base: 'text-slate-200',
         border: 'border-slate-400',
-        text: 'text-slate-200',
+        text: 'text-slate-300',
         bg: 'bg-slate-800',
         bgSelected: 'bg-slate-600',
         textSelected: 'text-white',

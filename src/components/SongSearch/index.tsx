@@ -73,7 +73,6 @@ export default function SongSearch({ user }: SongSearchProps) {
 
             query = query.limit(20)
             const { data } = await query
-            console.log(data)
             setSongs(data || [])
         } catch (error) {
             console.error('Search error:', error)

@@ -24,8 +24,6 @@ export default function SongList({ songs, user, searchSongs }: SongListProps) {
     }) => {
         if (!selectedSong) return
 
-        console.log('Submitting rating data:', data)
-
         await supabase
             .from('user_songs')
             .update({
@@ -68,7 +66,6 @@ interface SongItemProps {
 }
 function SongItem({ song, openRatingModal }: SongItemProps) {
     const userSong = song.user_songs?.[0]
-    const isFavorite = true// (userSong?.rating ?? -1) > 8
     const languageTag = userSong?.language_override || song.language
 
     const getDifficultyLabel = (numericValue: number | null | undefined) => {

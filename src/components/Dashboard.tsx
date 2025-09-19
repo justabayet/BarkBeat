@@ -26,8 +26,8 @@ export default function Dashboard({ user }: DashboardProps) {
         <main className="max-w-2xl mx-auto w-full px-0 sm:px-2 pb-20 md:pb-6">
           {activeTab === 'search' && <SongSearch user={user} />}
           {activeTab === 'global' && <GlobalSearch user={user} />}
-          {activeTab === 'sessions' && <SessionManager user={user} />}
-          {activeTab === 'library' && <Library user={user} />}
+          {/* {activeTab === 'sessions' && <SessionManager user={user} />}
+          {activeTab === 'library' && <Library user={user} />} */}
           {activeTab === 'user' && <UserPage user={user} />}
         </main>
       </div>

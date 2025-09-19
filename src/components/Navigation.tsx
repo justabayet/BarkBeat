@@ -1,4 +1,4 @@
-import { Play, Search, Users, Music, LogOut, UserIcon } from "lucide-react";
+import { Play, Search, Users, Music, LogOut, UserIcon, Plus } from "lucide-react";
 import { ActiveTab } from "./Dashboard";
 
 
@@ -14,10 +14,10 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
             <nav className="hidden md:block bg-gradient-to-r from-gray-900/80 via-gray-950/80 to-black/80 backdrop-blur-md mt-4 rounded-xl border border-gray-800/70 shadow-lg sticky top-0 z-30">
                 <div className="max-w-2xl mx-auto flex gap-4 justify-center py-2">
                     {[
-                        { id: 'search', label: 'Session', icon: Play },
-                        { id: 'global', label: 'Search', icon: Search },
-                        { id: 'sessions', label: 'Sessions', icon: Users },
-                        { id: 'library', label: 'My Library', icon: Music },
+                        { id: 'search', label: 'Search', icon: Search },
+                        { id: 'global', label: 'Add', icon: Plus },
+                        // { id: 'sessions', label: 'Sessions', icon: Users },
+                        // { id: 'library', label: 'My Library', icon: Music },
                         { id: 'user', label: 'User', icon: LogOut },
                     ].map(({ id, label, icon: Icon }) => (
                         <button
@@ -37,10 +37,10 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
             {/* Mobile bottom nav */}
             <nav className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-r from-gray-900/90 via-gray-950/90 to-black/90 backdrop-blur-md border-t border-gray-800/80 flex md:hidden justify-around py-2 shadow-t-xl">
                 {[
-                    { id: 'search', label: 'Search', icon: Play },
-                    { id: 'global', label: 'Global', icon: Search },
-                    { id: 'sessions', label: 'Sessions', icon: Users },
-                    { id: 'library', label: 'Library', icon: Music },
+                    { id: 'search', label: 'Search', icon: Search },
+                    { id: 'global', label: 'Add', icon: Plus },
+                    // { id: 'sessions', label: 'Sessions', icon: Users },
+                    // { id: 'library', label: 'Library', icon: Music },
                     { id: 'user', label: 'User', icon: UserIcon },
                 ].map(({ id, label, icon: Icon }) => (
                     <button
