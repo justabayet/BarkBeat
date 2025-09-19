@@ -58,7 +58,7 @@ export default function Dashboard({ user }: DashboardProps) {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold">🎤 Smart Karaoke</h1>
+              <h1 className="text-2xl font-bold">🎤 BarkBeat</h1>
               <span className="text-sm text-purple-200">Welcome, {profile?.name || user.email}</span>
             </div>
             <button

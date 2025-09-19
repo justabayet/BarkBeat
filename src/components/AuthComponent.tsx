@@ -10,7 +10,7 @@ export default function AuthComponent() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">🎤 Smart Karaoke</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">🎤 BarkBeat</h1>
           <p className="text-gray-600">Personalized karaoke for you and your friends</p>
         </div>
         
