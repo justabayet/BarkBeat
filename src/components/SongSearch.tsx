@@ -1,7 +1,8 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import FilterPopoverButton from './FilterPopoverButton'
 import Pill from './Pill'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
@@ -24,6 +25,9 @@ export default function SongSearch({ user }: SongSearchProps) {
   const [selectedLanguageTags, setSelectedLanguageTags] = useState<string[]>([])
   const [difficulty, setDifficulty] = useState<string | null>(null)
   const [newOnly, setNewOnly] = useState(false)
+  // Popover state
+  const [filterOpen, setFilterOpen] = useState(false)
+  const popoverRef = useRef<HTMLDivElement>(null)
   // Example tag options (replace with dynamic fetch if needed)
   const moodTagOptions = [
     { label: 'Party', color: 'pink' },
@@ -141,96 +145,120 @@ export default function SongSearch({ user }: SongSearchProps) {
     searchSongs() // Refresh results
   }
 
+
   return (
     <div className="space-y-6 min-h-screen p-4">
       {/* Search bar */}
-      <div className="flex items-center space-x-4 sticky top-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-        <input
-          type="text"
-          placeholder="Search Spotify for songs or artists..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && searchSongs()}
-          className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
-        />
-
-        <button
-          onClick={() => searchSongs()}
-          disabled={loading}
-          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
-        >
-          {loading ?
-            <Loader size={22} /> : <Search size={22} />}
-        </button>
-      </div>
-
-      {/* Filter panel */}
-      <div className="flex flex-wrap gap-4 items-center bg-slate-800 p-4 rounded-lg border border-slate-700">
-        {/* Mood tags */}
-        <div>
-          <label className="block text-xs font-semibold mb-1 text-slate-200">Mood Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {moodTagOptions.map(opt => (
-              <Pill
-                key={opt.label}
-                label={opt.label}
-                color={opt.color}
-                selected={selectedMoodTags.includes(opt.label)}
-                onClick={() => setSelectedMoodTags(selectedMoodTags.includes(opt.label)
-                  ? selectedMoodTags.filter(t => t !== opt.label)
-                  : [...selectedMoodTags, opt.label])}
-              />
-            ))}
-          </div>
-        </div>
-        {/* Language tags */}
-        <div>
-          <label className="block text-xs font-semibold mb-1 text-slate-200">Language Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {languageTagOptions.map(opt => (
-              <Pill
-                key={opt.label}
-                label={opt.label}
-                color={opt.color}
-                selected={selectedLanguageTags.includes(opt.label)}
-                onClick={() => setSelectedLanguageTags(selectedLanguageTags.includes(opt.label)
-                  ? selectedLanguageTags.filter(t => t !== opt.label)
-                  : [...selectedLanguageTags, opt.label])}
-              />
-            ))}
-          </div>
-        </div>
-        {/* Difficulty */}
-        <div>
-          <label className="block text-xs font-semibold mb-1 text-slate-200">Difficulty</label>
-          <div className="flex flex-wrap gap-2">
-            {difficultyOptions.map(opt => (
-              <Pill
-                key={opt.value}
-                label={opt.label}
-                color={opt.color}
-                selected={difficulty === opt.value}
-                onClick={() => setDifficulty(difficulty === opt.value ? null : opt.value)}
-              />
-            ))}
-          </div>
-        </div>
-        {/* New only */}
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center space-x-4 sticky top-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
           <input
-            type="checkbox"
-            checked={newOnly}
-            onChange={e => setNewOnly(e.target.checked)}
-            id="newOnly"
-            className="accent-purple-600"
+            type="text"
+            placeholder="Search Spotify for songs or artists..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && searchSongs()}
+            className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
           />
-          <label htmlFor="newOnly" className="text-xs font-semibold text-slate-200">New songs only</label>
+          <button
+            onClick={() => searchSongs()}
+            disabled={loading}
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
+          >
+            {loading ? <Loader size={22} /> : <Search size={22} />}
+          </button>
         </div>
+        {/* Pills row and popover button */}
+        <div className="flex items-center gap-2 mt-2">
+          {/* Show selected pills in a row */}
+          {selectedMoodTags.map(label => {
+            const opt = moodTagOptions.find(o => o.label === label)
+            return opt ? <Pill key={label} label={label} color={opt.color} selected onClick={() => { }} /> : null
+          })}
+          {selectedLanguageTags.map(label => {
+            const opt = languageTagOptions.find(o => o.label === label)
+            return opt ? <Pill key={label} label={label} color={opt.color} selected onClick={() => { }} /> : null
+          })}
+          {difficulty && (() => {
+            const opt = difficultyOptions.find(o => o.value === difficulty)
+            return opt ? <Pill key={opt.value} label={opt.label} color={opt.color} selected onClick={() => { }} /> : null
+          })()}
+          {newOnly && <Pill label="New only" color="purple" selected onClick={() => { }} />}
+          <FilterPopoverButton onClick={() => setFilterOpen(v => !v)} />
+        </div>
+        {/* Popover for filters */}
+        {filterOpen && (
+          <div ref={popoverRef} className="absolute z-50 mt-25 left-0 w-full max-w-xl bg-slate-900 border border-slate-700 rounded-xl shadow-lg p-6 flex flex-wrap gap-6">
+            {/* Mood tags */}
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-slate-200">Mood Tags</label>
+              <div className="flex flex-wrap gap-2">
+                {moodTagOptions.map(opt => (
+                  <Pill
+                    key={opt.label}
+                    label={opt.label}
+                    color={opt.color}
+                    selected={selectedMoodTags.includes(opt.label)}
+                    onClick={() => setSelectedMoodTags(selectedMoodTags.includes(opt.label)
+                      ? selectedMoodTags.filter(t => t !== opt.label)
+                      : [...selectedMoodTags, opt.label])}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* Language tags */}
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-slate-200">Language Tags</label>
+              <div className="flex flex-wrap gap-2">
+                {languageTagOptions.map(opt => (
+                  <Pill
+                    key={opt.label}
+                    label={opt.label}
+                    color={opt.color}
+                    selected={selectedLanguageTags.includes(opt.label)}
+                    onClick={() => setSelectedLanguageTags(selectedLanguageTags.includes(opt.label)
+                      ? selectedLanguageTags.filter(t => t !== opt.label)
+                      : [...selectedLanguageTags, opt.label])}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* Difficulty */}
+            <div>
+              <label className="block text-xs font-semibold mb-1 text-slate-200">Difficulty</label>
+              <div className="flex flex-wrap gap-2">
+                {difficultyOptions.map(opt => (
+                  <Pill
+                    key={opt.value}
+                    label={opt.label}
+                    color={opt.color}
+                    selected={difficulty === opt.value}
+                    onClick={() => setDifficulty(difficulty === opt.value ? null : opt.value)}
+                  />
+                ))}
+              </div>
+            </div>
+            {/* New only */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={newOnly}
+                onChange={e => setNewOnly(e.target.checked)}
+                id="newOnly"
+                className="accent-purple-600"
+              />
+              <label htmlFor="newOnly" className="text-xs font-semibold text-slate-200">New songs only</label>
+            </div>
+            <button
+              className="ml-auto mt-4 px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors"
+              onClick={() => setFilterOpen(false)}
+            >Close</button>
+          </div>
+        )}
       </div>
 
       {/* Song list */}
-      <div className="grid gap-4">
+      <div className="grid gap-4 mt-8">
         {songs.map((song) => {
           const userSong = song.user_songs?.[0]
           return (
