@@ -93,52 +93,52 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
           {loading ? 'Searching...' : 'Search'}
         </button>
       </div>
-      <div className="grid gap-4">
+      <div className="flex flex-col gap-2">
         {results.map(track => (
-          <div key={track.id} className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-            <div className="flex justify-between items-start">
-              {track.album?.images?.[0]?.url && (
-                <Image
-                  src={track.album.images[0].url}
-                  alt={track.album.name}
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 rounded shadow mr-4 object-cover"
-                  style={{ minWidth: 64 }}
-                  unoptimized
-                />
-              )}
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">{track.name}</h3>
-                <p className="text-purple-200 mb-2">
-                  {track.artists.map((a, i) => (
-                    <span key={a.name}>
-                      <span
-                        className="hover:underline cursor-pointer text-purple-300"
-                        onClick={() => {
-                          const artistQuery = `artist:${a.name}`;
-                          setSearchTerm(artistQuery);
-                          searchSpotify({ customTerm: artistQuery });
-                        }}
-                      >
-                        {a.name}
-                      </span>
-                      {i < track.artists.length - 1 && ', '}
+          <div key={track.id} className="flex items-center gap-4 bg-white/5 rounded-lg px-3 py-2 min-h-[72px]">
+            {track.album?.images?.[0]?.url && (
+              <Image
+                src={track.album.images[0].url}
+                alt={track.album.name}
+                width={72}
+                height={72}
+                className="w-18 h-18 rounded object-cover flex-shrink-0"
+                style={{ minWidth: 72, minHeight: 72, maxHeight: 72, maxWidth: 72 }}
+                unoptimized
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <span className="font-semibold text-base text-white truncate block">{track.name}</span>
+              <span className="text-purple-200 text-sm truncate block">
+                {track.artists.map((a, i) => (
+                  <span key={a.name}>
+                    <span
+                      className="hover:underline cursor-pointer text-purple-300"
+                      onClick={() => {
+                        const artistQuery = `artist:${a.name}`;
+                        setSearchTerm(artistQuery);
+                        searchSpotify({ customTerm: artistQuery });
+                      }}
+                    >
+                      {a.name}
                     </span>
-                  ))}
-                </p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => addToLibrary(track)}
-                  disabled={addedId === track.id}
-                  className="flex items-center space-x-1 px-3 py-2 bg-green-600/20 hover:bg-green-600/30 rounded-lg transition-colors disabled:opacity-50"
-                >
-                  <Plus size={16} />
-                  <span>{addedId === track.id ? 'Added' : 'Add'}</span>
-                </button>
-              </div>
+                    {i < track.artists.length - 1 && ', '}
+                  </span>
+                ))}
+              </span>
             </div>
+            <button
+              onClick={() => addToLibrary(track)}
+              disabled={addedId === track.id}
+              className="flex items-center justify-center w-10 h-10 bg-green-600/20 hover:bg-green-600/30 rounded-full transition-colors disabled:opacity-50 text-lg ml-2"
+              aria-label={addedId === track.id ? 'Added' : 'Add'}
+            >
+              {addedId === track.id ? (
+                <span className="text-green-400 text-2xl font-bold">&#10003;</span>
+              ) : (
+                <Plus size={24} />
+              )}
+            </button>
           </div>
         ))}
       </div>
