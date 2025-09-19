@@ -104,8 +104,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
             .from('user_songs')
             .insert({
                 user_id: user.id,
-                song_id: songId,
-                times_performed: 0
+                song_id: songId
             });
         if (userSongError) {
             setUserLibrary((prev) => {

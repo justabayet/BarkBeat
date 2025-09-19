@@ -39,7 +39,7 @@ export default function Library({ user }: LibraryProps) {
                                 <p className="text-purple-600 text-sm">{userSong.songs.artist}</p>
                                 <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
                                     <span>Difficulty: {userSong.difficulty_rating || 'Not rated'}/10</span>
-                                    <span>Performed: {userSong.times_performed} times</span>
+                                    <span>Rating: {userSong.rating || 'Not rated'}/10</span>
                                 </div>
                                 {userSong.mood_tags && userSong.mood_tags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-2">
@@ -51,7 +51,7 @@ export default function Library({ user }: LibraryProps) {
                                     </div>
                                 )}
                             </div>
-                            {userSong.is_favorite && <span className="text-yellow-400 text-xl">⭐</span>}
+                            {(userSong.rating ?? -1) > 8 && <span className="text-yellow-400 text-xl">⭐</span>}
                         </div>
                     </div>
                 ))}

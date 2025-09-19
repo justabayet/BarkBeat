@@ -183,36 +183,30 @@ export type Database = {
           created_at: string | null
           difficulty_rating: number | null
           id: string
-          is_favorite: boolean | null
-          language_tags: string[] | null
-          last_performed: string | null
+          language_override: string | null
           mood_tags: string[] | null
+          rating: number | null
           song_id: string | null
-          times_performed: number | null
           user_id: string | null
         }
         Insert: {
           created_at?: string | null
           difficulty_rating?: number | null
           id?: string
-          is_favorite?: boolean | null
-          language_tags?: string[] | null
-          last_performed?: string | null
+          language_override?: string | null
           mood_tags?: string[] | null
+          rating?: number | null
           song_id?: string | null
-          times_performed?: number | null
           user_id?: string | null
         }
         Update: {
           created_at?: string | null
           difficulty_rating?: number | null
           id?: string
-          is_favorite?: boolean | null
-          language_tags?: string[] | null
-          last_performed?: string | null
+          language_override?: string | null
           mood_tags?: string[] | null
+          rating?: number | null
           song_id?: string | null
-          times_performed?: number | null
           user_id?: string | null
         }
         Relationships: [
