@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
@@ -22,6 +22,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
   const [addedId, setAddedId] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const searchSpotify = async (opts?: { append?: boolean; customTerm?: string }) => {
     const term = opts?.customTerm ?? searchTerm;
@@ -36,7 +37,16 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
       const res = await fetch(`/search?q=${encodeURIComponent(term)}&type=track&offset=${opts?.append ? offset : 0}`);
       const data = await res.json();
       const newResults = data.tracks?.items || [];
-      setResults(prev => opts?.append ? [...prev, ...newResults] : newResults);
+      setResults(prev => {
+        if (opts?.append) {
+          // Filter out tracks with duplicate IDs
+          const existingIds = new Set(prev.map(t => t.id));
+          const filtered = newResults.filter(t => !existingIds.has(t.id));
+          return [...prev, ...filtered];
+        } else {
+          return newResults;
+        }
+      });
       setOffset(prev => (opts?.append ? prev + newResults.length : newResults.length));
       setHasMore((data.tracks?.next != null) && newResults.length > 0);
       if (opts?.customTerm) setSearchTerm(opts.customTerm);
@@ -74,6 +84,28 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
     if (!userSongError) setAddedId(track.id);
   };
 
+  // Infinite scroll effect
+  useEffect(() => {
+    if (!hasMore || loading) return;
+    const handleScroll = () => {
+      const el = listRef.current;
+      if (!el) return;
+      if (el.scrollHeight - el.scrollTop - el.clientHeight < 100) {
+        // Near bottom, load more
+        searchSpotify({ append: true });
+      }
+    };
+    const el = listRef.current;
+    if (el) {
+      el.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (el) {
+        el.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [hasMore, loading, results]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
@@ -93,7 +125,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
           {loading ? 'Searching...' : 'Search'}
         </button>
       </div>
-      <div className="flex flex-col gap-2">
+      <div ref={listRef} className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
         {results.map(track => (
           <div key={track.id} className="flex items-center gap-4 bg-white/5 rounded-lg px-3 py-2 min-h-[72px]">
             {track.album?.images?.[0]?.url && (
@@ -141,18 +173,10 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
             </button>
           </div>
         ))}
+        {loading && (
+          <div className="flex justify-center py-2 text-purple-300">Loading...</div>
+        )}
       </div>
-      {hasMore && results.length > 0 && (
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => searchSpotify({ append: true })}
-            disabled={loading}
-            className="px-6 py-3 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 rounded-lg transition-colors"
-          >
-            {loading ? 'Loading...' : 'Show More'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
