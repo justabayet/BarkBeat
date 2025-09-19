@@ -21,7 +21,6 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [results, setResults] = useState<SpotifyTrack[]>([]);
     const [loading, setLoading] = useState(false);
-    const [addedId, setAddedId] = useState<string | null>(null);
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [userLibrary, setUserLibrary] = useState<Set<string>>(new Set());
@@ -78,10 +77,12 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
     }, [searchTerm, offset]);
 
     const addToLibrary = async (track: SpotifyTrack) => {
-        // Insert into songs table if not exists, then into user_songs
-        // The songs table expects a UUID for id, but Spotify track.id is not a UUID.
-        // Use a surrogate UUID by hashing the Spotify id, or store the Spotify id in a separate column.
-        // Here, we use a deterministic UUID v5 from the Spotify id string.
+        setUserLibrary((prev) => {
+            const newLibrary = new Set(prev);
+            newLibrary.add(track.id);
+            return newLibrary;
+        });
+
         const NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'; // DNS namespace
         const songId = uuidv5(track.id, NAMESPACE);
         const { error: songError } = await supabase
@@ -106,11 +107,10 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                 song_id: songId,
                 times_performed: 0
             });
-        if (!userSongError) {
-            setAddedId(track.id)
+        if (userSongError) {
             setUserLibrary((prev) => {
                 const newLibrary = new Set(prev);
-                newLibrary.add(track.id);
+                newLibrary.delete(track.id);
                 return newLibrary;
             });
         };
@@ -188,11 +188,11 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                         </div>
                         <button
                             onClick={() => addToLibrary(track)}
-                            disabled={addedId === track.id || userLibrary.has(track.id)}
+                            disabled={userLibrary.has(track.id)}
                             className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-600 via-purple-500 to-purple-700 hover:from-purple-700 hover:to-purple-800 hover:shadow-lg rounded-full transition-all duration-150 disabled:opacity-60 text-lg ml-2 border border-purple-800/40"
-                            aria-label={addedId === track.id || userLibrary.has(track.id) ? 'Added' : 'Add'}
+                            aria-label={userLibrary.has(track.id) ? 'Added' : 'Add'}
                         >
-                            {(addedId === track.id || userLibrary.has(track.id)) ? (
+                            {(userLibrary.has(track.id)) ? (
                                 <span className="text-purple-200 text-2xl font-bold">&#10003;</span>
                             ) : (
                                 <Plus size={24} className="text-white" />
