@@ -14,7 +14,7 @@ interface DashboardProps {
   user: User
 }
 
-type ActiveTab = 'search' | 'sessions' | 'library' | 'global'
+type ActiveTab = 'search' | 'sessions' | 'library' | 'global' | 'user'
 
 export default function Dashboard({ user }: DashboardProps) {
   const [activeTab, setActiveTab] = useState<ActiveTab>('search')
@@ -42,7 +42,7 @@ export default function Dashboard({ user }: DashboardProps) {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      setUserSongs(data || [])
+  setUserSongs((data || []).filter((us) => us.songs !== null) as (UserSong & { songs: Song })[])
     }
 
     loadProfile()
@@ -55,69 +55,56 @@ export default function Dashboard({ user }: DashboardProps) {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-gray-900/80 via-gray-950/80 to-black/80 backdrop-blur-md border-b border-gray-800/80 px-4 py-4 sticky top-0 z-30 rounded-b-2xl shadow-lg w-full">
-        <div className="flex items-center justify-between w-full max-w-md md:max-w-2xl lg:max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-extrabold text-purple-300 drop-shadow-sm tracking-tight">🎤 BarkBeat</h1>
-            <span className="text-sm text-gray-200 hidden sm:inline font-medium">Welcome, {profile?.name || user.email}</span>
-          </div>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-200 rounded-xl text-sm font-semibold transition-colors shadow-sm border border-red-800/60"
-          >
-            <LogOut size={18} />
-            <span className="hidden sm:inline">Sign Out</span>
-          </button>
-        </div>
-      </header>
-
-      <div className="min-h-screen text-gray-100 bg-transparent w-full">
-        {/* Bottom nav for mobile, top nav for md+ */}
-        <nav className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-r from-gray-900/90 via-gray-950/90 to-black/90 backdrop-blur-md border-t border-gray-800/80 flex md:hidden justify-around py-2 shadow-t-xl">
+      {/* Navigation: Top for desktop, bottom for mobile */}
+      {/* Desktop top nav */}
+      <nav className="hidden md:block bg-gradient-to-r from-gray-900/80 via-gray-950/80 to-black/80 backdrop-blur-md mt-4 rounded-xl border border-gray-800/70 shadow-lg sticky top-0 z-30">
+        <div className="max-w-2xl mx-auto flex gap-4 justify-center py-2">
           {[
-            { id: 'search', label: 'Search', icon: Search },
-            { id: 'global', label: 'Global', icon: Globe },
+            { id: 'search', label: 'Search Songs', icon: Search },
+            { id: 'global', label: 'Global Search', icon: Globe },
             { id: 'sessions', label: 'Sessions', icon: Users },
-            { id: 'library', label: 'Library', icon: Music },
+            { id: 'library', label: 'My Library', icon: Music },
+            { id: 'user', label: 'User', icon: LogOut },
           ].map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id as ActiveTab)}
-              className={`flex flex-col items-center px-2 py-1 text-xs transition-colors rounded-lg ${activeTab === id
-                ? 'text-purple-300 font-bold bg-gray-800/60 shadow'
-                : 'text-gray-400 hover:text-purple-200 hover:bg-gray-800/40'
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-semibold ${activeTab === id
+                ? 'bg-gray-800/70 text-purple-200 font-bold shadow'
+                : 'text-gray-300 hover:text-purple-200 hover:bg-gray-800/40'
                 }`}
-              aria-label={label}
             >
-              <Icon size={22} />
+              <Icon size={18} />
               <span>{label}</span>
             </button>
           ))}
-        </nav>
-        {/* Top nav for md+ */}
-        <nav className="hidden md:block bg-gradient-to-r from-gray-900/80 via-gray-950/80 to-black/80 backdrop-blur-md mt-4 rounded-xl border border-gray-800/70 shadow-lg">
-          <div className="max-w-2xl mx-auto flex gap-4 justify-center py-2">
-            {[
-              { id: 'search', label: 'Search Songs', icon: Search },
-              { id: 'global', label: 'Global Search', icon: Globe },
-              { id: 'sessions', label: 'Sessions', icon: Users },
-              { id: 'library', label: 'My Library', icon: Music },
-            ].map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setActiveTab(id as ActiveTab)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-semibold ${activeTab === id
-                  ? 'bg-gray-800/70 text-purple-200 font-bold shadow'
-                  : 'text-gray-300 hover:text-purple-200 hover:bg-gray-800/40'
-                  }`}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </button>
-            ))}
-          </div>
-        </nav>
+        </div>
+      </nav>
+      {/* Mobile bottom nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-r from-gray-900/90 via-gray-950/90 to-black/90 backdrop-blur-md border-t border-gray-800/80 flex md:hidden justify-around py-2 shadow-t-xl">
+        {[
+          { id: 'search', label: 'Search', icon: Search },
+          { id: 'global', label: 'Global', icon: Globe },
+          { id: 'sessions', label: 'Sessions', icon: Users },
+          { id: 'library', label: 'Library', icon: Music },
+          { id: 'user', label: 'User', icon: LogOut },
+        ].map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id as ActiveTab)}
+            className={`flex flex-col items-center px-2 py-1 text-xs transition-colors rounded-lg ${activeTab === id
+              ? 'text-purple-300 font-bold bg-gray-800/60 shadow'
+              : 'text-gray-400 hover:text-purple-200 hover:bg-gray-800/40'
+              }`}
+            aria-label={label}
+          >
+            <Icon size={22} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
 
+      <div className="min-h-screen text-gray-100 bg-transparent w-full">
         <main className="max-w-2xl mx-auto w-full px-0 sm:px-2 py-6 pb-20 md:pb-6">
           {activeTab === 'search' && <SongSearch user={user} />}
           {activeTab === 'global' && <GlobalSearch user={user} />}
@@ -150,6 +137,22 @@ export default function Dashboard({ user }: DashboardProps) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+          {activeTab === 'user' && (
+            <div className="flex flex-col items-center justify-center gap-4 py-8">
+              <div className="bg-gradient-to-r from-purple-700/80 to-purple-900/80 rounded-2xl p-6 shadow-lg w-full max-w-xs flex flex-col items-center">
+                <div className="text-3xl mb-2">👤</div>
+                <div className="font-bold text-lg mb-1">{profile?.name || user.email}</div>
+                <div className="text-xs text-gray-300 mb-4">{user.email}</div>
+                <button
+                  onClick={signOut}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/40 text-red-200 rounded-xl text-sm font-semibold transition-colors shadow-sm border border-red-800/60"
+                >
+                  <LogOut size={18} />
+                  <span>Sign Out</span>
+                </button>
               </div>
             </div>
           )}
