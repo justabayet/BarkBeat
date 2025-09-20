@@ -107,7 +107,7 @@ export default function SongSearch({ user }: SongSearchProps) {
 
     const debouncedSearchTerm = useDebounce({ userId: user.id, searchTerm, selectedMoodTags, difficulty, newOnly }, 500); // 500ms debounce
 
-    const { data } = useSWR(
+    const { data, mutate } = useSWR(
         debouncedSearchTerm,
         searchSongs, { revalidateOnFocus: false }
     );
@@ -153,7 +153,7 @@ export default function SongSearch({ user }: SongSearchProps) {
                 />
             </div>
 
-            <SongList songs={songs} user={user} />
+            <SongList songs={songs} user={user} mutate={mutate} />
         </div>
     )
 }

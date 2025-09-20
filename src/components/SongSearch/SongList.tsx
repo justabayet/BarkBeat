@@ -7,9 +7,10 @@ import Pill, { getDifficultyString, pillConfig, PillKnown } from "../Pill"
 interface SongListProps {
     songs: AugmentedUserSong[]
     user: { id: string }
+    mutate: () => void
 }
 
-export default function SongList({ songs, user }: SongListProps) {
+export default function SongList({ songs, user, mutate }: SongListProps) {
     const [selectedSong, setSelectedSong] = useState<AugmentedUserSong | null>(null)
     const [showRatingModal, setShowRatingModal] = useState(false)
 
@@ -19,7 +20,7 @@ export default function SongList({ songs, user }: SongListProps) {
         language: string | null
         rating: number
     }) => {
-        if (!selectedSong) return
+        if (!selectedSong || !selectedSong.songs?.id) return
 
         await supabase
             .from('user_songs')
@@ -30,10 +31,11 @@ export default function SongList({ songs, user }: SongListProps) {
                 rating: data.rating
             })
             .eq('user_id', user.id)
-            .eq('song_id', selectedSong.id)
+            .eq('song_id', selectedSong.songs?.id)
 
         setShowRatingModal(false)
         setSelectedSong(null)
+        mutate(); // Refresh the list after rating
     }
 
     const openRatingModal = (song: AugmentedUserSong) => {
