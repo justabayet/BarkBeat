@@ -5,6 +5,8 @@ import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { useCallback } from 'react';
+import useDebounce from '@/hooks/useDebounce';
+import useSWR from 'swr';
 
 interface GlobalSearchProps {
     user: User;
@@ -120,7 +122,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
         if (!hasMore || loading) return;
         const handleScroll = () => {
             const scrollPosition = window.innerHeight + window.scrollY;
-            const threshold = document.body.offsetHeight - 200;
+            const threshold = document.body.offsetHeight - 300;
             if (scrollPosition >= threshold) {
                 searchSpotify({ append: true });
             }
@@ -131,27 +133,30 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
         };
     }, [hasMore, loading, results, searchSpotify]);
 
+
+
+    const debouncedSearchTerm = useDebounce({ searchTerm }, 500); // 500ms debounce
+
+    useSWR(
+        debouncedSearchTerm,
+        searchSpotify, { revalidateOnFocus: false }
+    );
+
+
     return (
         <div className="space-y-10 p-4">
             <div className="flex items-center space-x-4 sticky top-6">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                {loading &&
+                    <Loader className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                }
                 <input
                     type="text"
                     placeholder="Search Spotify for songs or artists..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && searchSpotify()}
                     className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
                 />
-
-                <button
-                    onClick={() => searchSpotify()}
-                    disabled={loading}
-                    className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
-                >
-                    {loading ?
-                        <Loader size={22} /> : <Search size={22} />}
-                </button>
             </div>
             <div ref={listRef} className="flex flex-col gap-8">
                 {results.map(track => (
