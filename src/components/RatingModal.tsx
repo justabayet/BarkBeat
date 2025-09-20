@@ -12,7 +12,7 @@ interface RatingModalProps {
     difficulty: number
     moodTags: string[]
     language: string | null
-    rating: number
+    rating: number | null
   }) => void
   onClose: () => void
   onDelete: (song: AugmentedUserSong) => void
@@ -20,7 +20,7 @@ interface RatingModalProps {
 
 export default function RatingModal({ song, onSubmit, onClose, onDelete }: RatingModalProps) {
   const userSong = song
-  const [rating, setRating] = useState(userSong?.rating ?? 0)
+  const [rating, setRating] = useState<number | null>(userSong?.rating ?? null)
   const [moodTags, setMoodTags] = useState<string[]>(userSong?.mood_tags ?? [])
   const [difficulty, setDifficulty] = useState<number>(userSong?.difficulty_rating ?? -1)
   const [language, setLanguage] = useState<string | null>((userSong.language_override ?? song.songs?.language) || null)
@@ -59,7 +59,7 @@ export default function RatingModal({ song, onSubmit, onClose, onDelete }: Ratin
                 type="range"
                 min="0"
                 max="10"
-                value={rating}
+                value={rating || 0}
                 onChange={(e) => setRating(Number(e.target.value))}
                 className="flex-1"
               />

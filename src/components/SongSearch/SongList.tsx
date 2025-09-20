@@ -18,7 +18,7 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
         difficulty: number
         moodTags: string[]
         language: string | null
-        rating: number
+        rating: number | null
     }) => {
         if (!selectedSong || !selectedSong.songs?.id) return
 
