@@ -38,7 +38,7 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 ">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className=" bg-gradient-to-b from-gray-900 via-gray-950 to-gray-950 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">{song.title}</h2>
@@ -64,9 +64,6 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
               />
               <span className="w-8 text-center font-bold">{rating}</span>
             </div>
-            {/* <div className="text-xs text-gray-400 mt-1">
-              0-2: Easy to sing • 3-4: Some challenging parts • 5-6: Moderate skill needed • 7-8: Quite difficult • 9-10: Very challenging
-            </div> */}
           </div>
 
           {/* Difficulty */}
@@ -114,20 +111,6 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
               ))}
             </div>
           </div>
-
-          {/* <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() => setIsFavorite(!isFavorite)}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${isFavorite
-                ? 'bg-yellow-600/30 text-yellow-300'
-                : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                }`}
-            >
-              <Star size={16} className={isFavorite ? 'fill-current' : ''} />
-              <span>Add to Favorites</span>
-            </button>
-          </div> */}
 
           <div className="flex space-x-3">
             <button

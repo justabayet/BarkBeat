@@ -29,7 +29,7 @@ export const pillConfig = {
         { label: 'Hard', value: 'hard', color: 'red' }
     ],
     newSongs: {
-        key: "New Songs", label: "New Songs", color: "blue"
+        key: "New Songs", label: "New", color: "blue"
     }
 }
 

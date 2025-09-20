@@ -1,18 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { AugmentedSong, Song } from "@/lib/typesInfered"
-import { Star } from "lucide-react"
+import { AugmentedSong } from "@/lib/typesInfered"
 import { useState } from "react"
 import RatingModal from "../RatingModal"
 import { supabase } from "@/lib/supabase"
-import Pill, { getDifficulty, getDifficultyString, pillConfig, PillKnown } from "../Pill"
+import Pill, { getDifficultyString, pillConfig, PillKnown } from "../Pill"
 
 interface SongListProps {
     songs: AugmentedSong[]
     user: { id: string }
-    searchSongs: () => void
 }
 
-export default function SongList({ songs, user, searchSongs }: SongListProps) {
+export default function SongList({ songs, user }: SongListProps) {
     const [selectedSong, setSelectedSong] = useState<AugmentedSong | null>(null)
     const [showRatingModal, setShowRatingModal] = useState(false)
 
@@ -37,7 +34,6 @@ export default function SongList({ songs, user, searchSongs }: SongListProps) {
 
         setShowRatingModal(false)
         setSelectedSong(null)
-        searchSongs() // Refresh results
     }
 
     const openRatingModal = (song: AugmentedSong) => {
@@ -83,6 +79,7 @@ function SongItem({ song, openRatingModal }: SongItemProps) {
         return 'text-red-400'
     }
     const difficultyLabel = getDifficultyLabel(userSong?.difficulty_rating)
+    const isNew = userSong?.rating == null
     return (
         <div className="bg-slate-800 rounded-xl shadow p-4 flex flex-col gap-2 border border-slate-700"
             onClick={() => openRatingModal(song)}>
@@ -108,6 +105,9 @@ function SongItem({ song, openRatingModal }: SongItemProps) {
                                 <PillKnown label={difficultyLabel} category="difficulty" selected={false} />
                             )
                         }
+                        {isNew && (
+                            <Pill label={pillConfig.newSongs.label} selected={false} color={pillConfig.newSongs.color} />
+                        )}
                     </div>
                 </div>
                 {userSong?.rating && (
