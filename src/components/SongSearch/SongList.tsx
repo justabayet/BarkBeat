@@ -22,20 +22,25 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
     }) => {
         if (!selectedSong || !selectedSong.songs?.id) return
 
-        await supabase
-            .from('user_songs')
-            .update({
-                difficulty_rating: data.difficulty,
-                mood_tags: data.moodTags,
-                language_override: data.language,
-                rating: data.rating
-            })
-            .eq('user_id', user.id)
-            .eq('song_id', selectedSong.songs?.id)
+        const fnAsync = async () => {
+
+            if (!selectedSong || !selectedSong.songs?.id) return
+            await supabase
+                .from('user_songs')
+                .update({
+                    difficulty_rating: data.difficulty,
+                    mood_tags: data.moodTags,
+                    language_override: data.language,
+                    rating: data.rating
+                })
+                .eq('user_id', user.id)
+                .eq('song_id', selectedSong.songs?.id)
+            mutate(); // Refresh the list after rating
+        }
 
         setShowRatingModal(false)
         setSelectedSong(null)
-        mutate(); // Refresh the list after rating
+        fnAsync()
     }
 
     const openRatingModal = (song: AugmentedUserSong) => {
