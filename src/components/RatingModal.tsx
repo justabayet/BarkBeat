@@ -2,7 +2,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { Trash, X } from 'lucide-react'
 import type { AugmentedUserSong } from '@/lib/typesInfered'
 import Pill, { getDifficulty, pillConfig } from './Pill'
 
@@ -15,9 +15,10 @@ interface RatingModalProps {
     rating: number
   }) => void
   onClose: () => void
+  onDelete: (song: AugmentedUserSong) => void
 }
 
-export default function RatingModal({ song, onSubmit, onClose }: RatingModalProps) {
+export default function RatingModal({ song, onSubmit, onClose, onDelete }: RatingModalProps) {
   const userSong = song
   const [rating, setRating] = useState(userSong?.rating ?? 0)
   const [moodTags, setMoodTags] = useState<string[]>(userSong?.mood_tags ?? [])
@@ -111,6 +112,14 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
               ))}
             </div>
           </div>
+
+          <button
+            className="z-10 bg-red-900 hover:bg-red-700 text-white rounded-full p-2 shadow border-2 border-red-500"
+            title="Delete song"
+            onClick={e => { e.stopPropagation(); onDelete(song); }}
+          >
+            <Trash size={20} />
+          </button>
 
           <div className="flex space-x-3">
             <button

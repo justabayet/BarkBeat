@@ -48,6 +48,15 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
         setShowRatingModal(true)
     }
 
+    const handleDelete = async (song: AugmentedUserSong) => {
+        if (!song.songs?.id) return;
+        await supabase
+            .from('user_songs')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('song_id', song.songs.id);
+        mutate(); // Refresh the list after deletion
+    }
     return (<>
         <div className="grid gap-6 p-4 pt-0">
             {songs.map((song) => <SongItem song={song} key={song.id} openRatingModal={openRatingModal} />)}
@@ -58,6 +67,7 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
                 song={selectedSong}
                 onSubmit={handleRatingSubmit}
                 onClose={() => setShowRatingModal(false)}
+                onDelete={handleDelete}
             />
         )}
     </>)
