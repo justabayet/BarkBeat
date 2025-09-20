@@ -1,16 +1,16 @@
-import { AugmentedSong } from "@/lib/typesInfered"
+import { AugmentedUserSong } from "@/lib/typesInfered"
 import { useState } from "react"
 import RatingModal from "../RatingModal"
 import { supabase } from "@/lib/supabase"
 import Pill, { getDifficultyString, pillConfig, PillKnown } from "../Pill"
 
 interface SongListProps {
-    songs: AugmentedSong[]
+    songs: AugmentedUserSong[]
     user: { id: string }
 }
 
 export default function SongList({ songs, user }: SongListProps) {
-    const [selectedSong, setSelectedSong] = useState<AugmentedSong | null>(null)
+    const [selectedSong, setSelectedSong] = useState<AugmentedUserSong | null>(null)
     const [showRatingModal, setShowRatingModal] = useState(false)
 
     const handleRatingSubmit = async (data: {
@@ -36,7 +36,7 @@ export default function SongList({ songs, user }: SongListProps) {
         setSelectedSong(null)
     }
 
-    const openRatingModal = (song: AugmentedSong) => {
+    const openRatingModal = (song: AugmentedUserSong) => {
         setSelectedSong(song)
         setShowRatingModal(true)
     }
@@ -57,12 +57,12 @@ export default function SongList({ songs, user }: SongListProps) {
 }
 
 interface SongItemProps {
-    song: AugmentedSong
-    openRatingModal: (song: AugmentedSong) => void
+    song: AugmentedUserSong
+    openRatingModal: (song: AugmentedUserSong) => void
 }
 function SongItem({ song, openRatingModal }: SongItemProps) {
-    const userSong = song.user_songs?.[0]
-    const languageTag = userSong?.language_override || song.language
+    const userSong = song
+    const languageTag = userSong?.language_override || song.songs?.language
 
     const getDifficultyLabel = (numericValue: number | null | undefined) => {
         if (numericValue == null) {
@@ -85,8 +85,8 @@ function SongItem({ song, openRatingModal }: SongItemProps) {
             onClick={() => openRatingModal(song)}>
             <div className="flex justify-between items-start gap-2">
                 <div className="flex-1 space-y-1">
-                    <h3 className="font-semibold text-base text-slate-100 leading-tight">{song.title}</h3>
-                    <p className="text-purple-400 text-sm mb-3">{song.artist}</p>
+                    <h3 className="font-semibold text-base text-slate-100 leading-tight">{song.songs?.title}</h3>
+                    <p className="text-purple-400 text-sm mb-3">{song.songs?.artist}</p>
                     <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
                         {languageTag != null && (
                             <PillKnown label={languageTag} category="language" selected={false} />

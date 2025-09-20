@@ -8,6 +8,7 @@ import FiltersPanel from './FiltersPanel'
 import SongList from './SongList'
 import useSWR from 'swr';
 import useDebounce from '@/hooks/useDebounce'
+import { AugmentedUserSong } from '@/lib/typesInfered'
 
 interface SongSearchProps {
     user: User
@@ -26,71 +27,83 @@ export default function SongSearch({ user }: SongSearchProps) {
         userId,
         searchTerm,
         selectedMoodTags,
+        selectedLanguageTags,
         difficulty,
         newOnly
     }: {
         userId: string,
         searchTerm: string,
         selectedMoodTags: string[],
+        selectedLanguageTags: string[],
         difficulty: string | null,
         newOnly: boolean
-    }) => {
+    }): Promise<AugmentedUserSong[]> => {
         setLoading(true)
         try {
-            const filters = [`user_songs.user_id.eq.${userId}`]
-            if (searchTerm.trim()) {
-                filters.push(`title.ilike.%${searchTerm}%`)
-                filters.push(`artist.ilike.%${searchTerm}%`)
-            }
-            // Build the or filter for search term if present
+            // Start from user_songs and include the related song
             let query = supabase
-                .from('songs')
-                .select('*, user_songs!inner(*)')
-                .eq('user_songs.user_id', userId) // always filter by user_id first
+                .from('user_songs')
+                .select(`*, songs (*)`)
+                .eq('user_id', userId)
 
-            if (searchTerm.trim()) {
-                // only the title/artist search is OR'd
-                query = query.or(
-                    `title.ilike.%${searchTerm}%,artist.ilike.%${searchTerm}%`
-                )
-            }
-
-            // Mood tags
-            if (selectedMoodTags.length > 0) {
+            // Mood tags (array contains)
+            if (selectedMoodTags?.length > 0) {
                 for (const tag of selectedMoodTags) {
-                    query = query.contains('user_songs.mood_tags', [tag])
+                    query = query.contains('mood_tags', [tag])
                 }
             }
+
             // Language tags
-            if (selectedLanguageTags.length > 0) {
+            if (selectedLanguageTags?.length > 0) {
                 for (const tag of selectedLanguageTags) {
-                    query = query.eq('user_songs.language_override', tag)
+                    query = query.eq('language_override', tag)
                 }
             }
-            // Difficulty (map string to number)
+
+            // Difficulty
             if (difficulty) {
-                let diffNum = null
+                let diffNum: number | null = null
                 if (difficulty === 'easy') diffNum = 0
                 if (difficulty === 'intermediate') diffNum = 1
                 if (difficulty === 'hard') diffNum = 2
                 if (diffNum !== null) {
-                    query = query.eq('user_songs.difficulty_rating', diffNum)
+                    query = query.eq('difficulty_rating', diffNum)
                 }
             }
-            // New only (has not rating yet)
+
+            // New only (no rating yet)
             if (newOnly) {
-                query = query.is('user_songs.rating', null)
+                query = query.is('rating', null)
             }
 
-            query = query.limit(20)
-            const { data } = await query
-            return data || []
+            const { data, error } = await query
+            if (error) throw error
+
+            let filtered = data || [];
+            if (searchTerm.trim()) {
+                const term = searchTerm.trim().toLowerCase();
+                filtered = filtered.filter(row => {
+                    const title = row.songs?.title?.toLowerCase() || '';
+                    const artist = row.songs?.artist?.toLowerCase() || '';
+                    return title.includes(term) || artist.includes(term);
+                });
+            }
+            // Limit to 20 after filtering
+            return filtered
+                .slice(0, 20)
+                .sort((a, b) => {
+                    const ratingA = a.rating ?? -1;
+                    const ratingB = b.rating ?? -1;
+                    return ratingB - ratingA;
+                });
         } catch (error) {
             console.error('Search error:', error)
+            return []
         } finally {
             setLoading(false)
         }
     }
+
 
     const debouncedSearchTerm = useDebounce({ userId: user.id, searchTerm, selectedMoodTags, difficulty, newOnly }, 500); // 500ms debounce
 

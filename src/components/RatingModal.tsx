@@ -3,11 +3,11 @@
 
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import type { AugmentedSong } from '@/lib/typesInfered'
+import type { AugmentedUserSong } from '@/lib/typesInfered'
 import Pill, { getDifficulty, pillConfig } from './Pill'
 
 interface RatingModalProps {
-  song: AugmentedSong
+  song: AugmentedUserSong
   onSubmit: (data: {
     difficulty: number
     moodTags: string[]
@@ -18,11 +18,11 @@ interface RatingModalProps {
 }
 
 export default function RatingModal({ song, onSubmit, onClose }: RatingModalProps) {
-  const userSong = song.user_songs?.[0]
+  const userSong = song
   const [rating, setRating] = useState(userSong?.rating ?? 0)
   const [moodTags, setMoodTags] = useState<string[]>(userSong?.mood_tags ?? [])
   const [difficulty, setDifficulty] = useState<number>(userSong?.difficulty_rating ?? -1)
-  const [language, setLanguage] = useState<string | null>(userSong?.language_override ?? song.language)
+  const [language, setLanguage] = useState<string | null>((userSong.language_override ?? song.songs?.language) || null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,12 +41,12 @@ export default function RatingModal({ song, onSubmit, onClose }: RatingModalProp
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <div className=" bg-gradient-to-b from-gray-900 via-gray-950 to-gray-950 rounded-lg shadow-lg p-6 w-full max-w-md mx-auto">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">{song.title}</h2>
+          <h2 className="text-xl font-bold">{song.songs?.title}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
             <X size={24} />
           </button>
         </div>
-        <p className="text-purple-400 text-lg mb-4">{song.artist}</p>
+        <p className="text-purple-400 text-lg mb-4">{song.songs?.artist}</p>
         <form onSubmit={handleSubmit} className="space-y-6">
 
           <div>
