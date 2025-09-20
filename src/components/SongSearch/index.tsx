@@ -90,7 +90,7 @@ export default function SongSearch({ user }: SongSearchProps) {
             }
             // Limit to 20 after filtering
             return filtered
-                .slice(0, 20)
+                // .slice(0, 20)
                 .sort((a, b) => {
                     const ratingA = a.rating ?? -1;
                     const ratingB = b.rating ?? -1;
