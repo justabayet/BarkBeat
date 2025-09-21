@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { Search, Loader } from 'lucide-react'
@@ -18,105 +18,97 @@ interface SongSearchProps {
 
 export default function SongSearch({ user }: SongSearchProps) {
     const [searchTerm, setSearchTerm] = useState('')
-    const [loading, setLoading] = useState(false)
     // Filter panel state
     const [selectedMoodTags, setSelectedMoodTags] = useState<string[]>([])
     const [selectedLanguageTags, setSelectedLanguageTags] = useState<string[]>([])
     const [difficulty, setDifficulty] = useState<string | null>(null)
     const [newOnly, setNewOnly] = useState(false)
 
-    const searchSongs = async ({
-        userId,
-        searchTerm,
-        selectedMoodTags,
-        selectedLanguageTags,
-        difficulty,
-        newOnly
-    }: {
-        userId: string,
-        searchTerm: string,
-        selectedMoodTags: string[],
-        selectedLanguageTags: string[],
-        difficulty: string | null,
-        newOnly: boolean
-    }): Promise<AugmentedUserSong[]> => {
-        setLoading(true)
+
+    // Fetch all user songs once
+    const fetchAllUserSongs = async (userId: string): Promise<AugmentedUserSong[]> => {
         try {
-            // Start from user_songs and include the related song
-            let query = supabase
+            const { data, error } = await supabase
                 .from('user_songs')
                 .select(`*, songs (*)`)
                 .eq('user_id', userId)
 
-            // Mood tags (array contains)
-            if (selectedMoodTags?.length > 0) {
-                for (const tag of selectedMoodTags) {
-                    query = query.contains('mood_tags', [tag])
-                }
-            }
-
-            // Language tags
-            if (selectedLanguageTags?.length > 0) {
-                for (const tag of selectedLanguageTags) {
-                    query = query.eq('language_override', tag)
-                }
-            }
-
-            // Difficulty
-            if (difficulty) {
-                let diffNum: number | null = null
-                if (difficulty === 'easy') diffNum = 0
-                if (difficulty === 'intermediate') diffNum = 1
-                if (difficulty === 'hard') diffNum = 2
-                if (diffNum !== null) {
-                    query = query.eq('difficulty_rating', diffNum)
-                }
-            }
-
-            // New only (no rating yet)
-            if (newOnly) {
-                query = query.is('rating', null)
-            }
-
-            const { data, error } = await query
             if (error) throw error
-
-            let filtered = data || [];
-            if (searchTerm.trim()) {
-                const term = searchTerm.trim().toLowerCase();
-                filtered = filtered.filter(row => {
-                    const title = row.songs?.title?.toLowerCase() || '';
-                    const artist = row.songs?.artist?.toLowerCase() || '';
-                    return title.includes(term) || artist.includes(term);
-                });
-            }
-            // Limit to 20 after filtering
-            return filtered
-                // .slice(0, 20)
-                .sort((a, b) => {
-                    const ratingA = a.rating ?? -1;
-                    const ratingB = b.rating ?? -1;
-                    return ratingB - ratingA;
-                });
+            return data || []
         } catch (error) {
-            console.error('Search error:', error)
+            console.error('Fetch error:', error)
             return []
-        } finally {
-            setLoading(false)
         }
     }
 
+    const { data: allSongs = [], mutate } = useSWR(
+        `user-songs-${user.id}`,
+        () => fetchAllUserSongs(user.id),
+        { revalidateOnFocus: false }
+    )
 
-    const debouncedSearchTerm = useDebounce({ userId: user.id, searchTerm, selectedMoodTags, difficulty, newOnly }, 500); // 500ms debounce
+    const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
-    const { data, mutate } = useSWR(
-        debouncedSearchTerm,
-        searchSongs, { revalidateOnFocus: false }
-    );
+    // Client-side filtering with useMemo for performance
+    const filteredSongs = useMemo(() => {
+        let filtered = [...allSongs]
 
-    const songs = data || [];
+        // Search term filter
+        if (debouncedSearchTerm.trim()) {
+            const term = debouncedSearchTerm.trim().toLowerCase()
+            filtered = filtered.filter(row => {
+                const title = row.songs?.title?.toLowerCase() || ''
+                const artist = row.songs?.artist?.toLowerCase() || ''
+                return title.includes(term) || artist.includes(term)
+            })
+        }
+
+        // Mood tags filter
+        if (selectedMoodTags.length > 0) {
+            filtered = filtered.filter(row => {
+                const moodTags = row.mood_tags || []
+                return selectedMoodTags.every(tag => moodTags.includes(tag))
+            })
+        }
+
+        // Language tags filter
+        if (selectedLanguageTags.length > 0) {
+            filtered = filtered.filter(row =>
+                selectedLanguageTags.includes(row.language_override || '')
+            )
+        }
+
+        // Difficulty filter
+        if (difficulty) {
+            let diffNum: number | null = null
+            if (difficulty === 'easy') diffNum = 0
+            if (difficulty === 'intermediate') diffNum = 1
+            if (difficulty === 'hard') diffNum = 2
+
+            if (diffNum !== null) {
+                filtered = filtered.filter(row => row.difficulty_rating === diffNum)
+            }
+        }
+
+        // New only filter
+        if (newOnly) {
+            filtered = filtered.filter(row => row.rating === null)
+        }
+
+        // Sort by rating (highest first, null ratings last)
+        return filtered.sort((a, b) => {
+            const ratingA = a.rating ?? -1
+            const ratingB = b.rating ?? -1
+            return ratingB - ratingA
+        })
+    }, [allSongs, debouncedSearchTerm, selectedMoodTags, selectedLanguageTags, difficulty, newOnly])
 
     const { spotifySongs, loading: loadingSpotify } = useSpotifySongs(searchTerm)
+
+    // When filteredSongs or spotifySongs change, we scroll to top
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [filteredSongs])
 
     return (
         <div className="space-y-2 min-h-screen">
@@ -124,7 +116,7 @@ export default function SongSearch({ user }: SongSearchProps) {
             <div className="flex flex-col gap-2 sticky top-0 p-4 bg-gradient-to-b from-gray-900 via-gray-950">
                 <div className="flex items-center space-x-4 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    {(loading || loadingSpotify) &&
+                    {(loadingSpotify) &&
                         <Loader className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                     }
                     <input
@@ -148,8 +140,8 @@ export default function SongSearch({ user }: SongSearchProps) {
                 />
             </div>
 
-            <SongList songs={songs} user={user} mutate={mutate} />
-            <SongListSpotify songs={spotifySongs} user={user} />
+            <SongList songs={filteredSongs} user={user} mutate={mutate} />
+            {searchTerm.trim() !== '' && <SongListSpotify songs={spotifySongs} user={user} allSongs={allSongs} loading={loadingSpotify} />}
         </div>
     )
 }
