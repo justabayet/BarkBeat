@@ -9,6 +9,8 @@ import SongList from './SongList'
 import useSWR from 'swr';
 import useDebounce from '@/hooks/useDebounce'
 import { AugmentedUserSong } from '@/lib/typesInfered'
+import useSpotifySongs from '@/hooks/useSpotifySongs'
+import SongListSpotify from './SongListSpotify'
 
 interface SongSearchProps {
     user: User
@@ -114,6 +116,7 @@ export default function SongSearch({ user }: SongSearchProps) {
 
     const songs = data || [];
 
+    const { spotifySongs, loading: loadingSpotify } = useSpotifySongs(searchTerm)
 
     return (
         <div className="space-y-2 min-h-screen">
@@ -121,7 +124,7 @@ export default function SongSearch({ user }: SongSearchProps) {
             <div className="flex flex-col gap-2 sticky top-0 p-4 bg-gradient-to-b from-gray-900 via-gray-950">
                 <div className="flex items-center space-x-4 relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    {loading &&
+                    {(loading || loadingSpotify) &&
                         <Loader className="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                     }
                     <input
@@ -146,6 +149,7 @@ export default function SongSearch({ user }: SongSearchProps) {
             </div>
 
             <SongList songs={songs} user={user} mutate={mutate} />
+            <SongListSpotify songs={spotifySongs} user={user} />
         </div>
     )
 }

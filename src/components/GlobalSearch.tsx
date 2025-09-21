@@ -12,7 +12,7 @@ interface GlobalSearchProps {
     user: User;
 }
 
-type SpotifyTrack = {
+export type SpotifyTrack = {
     id: string;
     name: string;
     artists: { name: string }[];
