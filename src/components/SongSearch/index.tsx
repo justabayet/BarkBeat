@@ -129,16 +129,8 @@ export default function SongSearch({ user }: SongSearchProps) {
                         placeholder="Search Spotify for songs or artists..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        // onKeyDown={e => e.key === 'Enter' && searchSongs()}
                         className="w-full pl-10 pr-4 py-3 bg-slate-800 rounded-lg border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-sm"
                     />
-                    {/* <button
-                        // onClick={() => searchSongs()}
-                        disabled={loading}
-                        className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg transition-colors"
-                    >
-                        {loading ? <Loader size={22} /> : <Search size={22} />}
-                    </button> */}
                 </div>
                 {/* Pills row and popover button */}
                 <FiltersPanel
