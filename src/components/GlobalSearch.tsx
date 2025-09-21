@@ -170,6 +170,7 @@ export default function GlobalSearch({ user }: GlobalSearchProps) {
                                 className="w-18 h-18 rounded object-cover flex-shrink-0"
                                 style={{ minWidth: 72, minHeight: 72, maxHeight: 72, maxWidth: 72 }}
                                 unoptimized
+                                loader={() => '/placeholder.png'}
                             />
                         )}
                         <div className="flex-1 min-w-0">
