@@ -1,4 +1,4 @@
-import { Play, Search, Users, Music, LogOut, UserIcon, Plus } from "lucide-react";
+import { Search, LogOut, UserIcon, Plus } from "lucide-react";
 import { ActiveTab } from "./Dashboard";
 
 

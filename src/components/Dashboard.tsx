@@ -4,10 +4,8 @@
 import { useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 import SongSearch from './SongSearch'
-import SessionManager from './SessionManager'
 import GlobalSearch from './GlobalSearch'
 import Navigation from './Navigation'
-import Library from './Library'
 import UserPage from './UserPage'
 
 interface DashboardProps {
@@ -26,8 +24,6 @@ export default function Dashboard({ user }: DashboardProps) {
         <main className="max-w-2xl mx-auto w-full px-0 sm:px-2 pb-20 md:pb-6">
           {activeTab === 'search' && <SongSearch user={user} />}
           {activeTab === 'global' && <GlobalSearch user={user} />}
-          {/* {activeTab === 'sessions' && <SessionManager user={user} />}
-          {activeTab === 'library' && <Library user={user} />} */}
           {activeTab === 'user' && <UserPage user={user} />}
         </main>
       </div>
