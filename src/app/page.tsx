@@ -10,6 +10,20 @@ export default function Home() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('SW registered successfully');
+          console.log('Scope:', registration.scope);
+        })
+        .catch(() => {
+          console.log('SW registration failed');
+        });
+    }
+  }, []);
+
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
