@@ -1,4 +1,4 @@
-import { Search, LogOut, UserIcon, Plus } from "lucide-react";
+import { Search, LogOut, UserIcon } from "lucide-react";
 import { ActiveTab } from "./Dashboard";
 
 
@@ -15,9 +15,6 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
                 <div className="max-w-2xl mx-auto flex gap-4 justify-center py-2 px-2">
                     {[
                         { id: 'search', label: 'Search', icon: Search },
-                        { id: 'global', label: 'Add', icon: Plus },
-                        // { id: 'sessions', label: 'Sessions', icon: Users },
-                        // { id: 'library', label: 'My Library', icon: Music },
                         { id: 'user', label: 'User', icon: LogOut },
                     ].map(({ id, label, icon: Icon }) => (
                         <button
@@ -56,9 +53,6 @@ export default function Navigation({ activeTab, setActiveTab }: NavigationProps)
             >
                 {[
                     { id: 'search', label: 'Search', icon: Search },
-                    { id: 'global', label: 'Add', icon: Plus },
-                    // { id: 'sessions', label: 'Sessions', icon: Users },
-                    // { id: 'library', label: 'Library', icon: Music },
                     { id: 'user', label: 'User', icon: UserIcon },
                 ].map(({ id, label, icon: Icon }) => (
                     <button

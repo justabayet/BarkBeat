@@ -41,7 +41,7 @@ export default function SongSearch({ user }: SongSearchProps) {
         }
     }
 
-    const { data: allSongs = [], mutate } = useSWR(
+    const { data: userLibrary = [], mutate } = useSWR(
         `user-songs-${user.id}`,
         () => fetchAllUserSongs(user.id),
         { revalidateOnFocus: false }
@@ -51,7 +51,7 @@ export default function SongSearch({ user }: SongSearchProps) {
 
     // Client-side filtering with useMemo for performance
     const filteredSongs = useMemo(() => {
-        let filtered = [...allSongs]
+        let filtered = [...userLibrary]
 
         // Search term filter
         if (debouncedSearchTerm.trim()) {
@@ -101,14 +101,14 @@ export default function SongSearch({ user }: SongSearchProps) {
             const ratingB = b.rating ?? -1
             return ratingB - ratingA
         })
-    }, [allSongs, debouncedSearchTerm, selectedMoodTags, selectedLanguageTags, difficulty, newOnly])
+    }, [userLibrary, debouncedSearchTerm, selectedMoodTags, selectedLanguageTags, difficulty, newOnly])
 
     const { spotifySongs, loading: loadingSpotify } = useSpotifySongs(searchTerm)
 
     // When filteredSongs or spotifySongs change, we scroll to top
     useEffect(() => {
         window.scrollTo(0, 0)
-    }, [filteredSongs])
+    }, [debouncedSearchTerm, selectedMoodTags, selectedLanguageTags, difficulty, newOnly])
 
     return (
         <div className="space-y-2 min-h-screen">
@@ -140,8 +140,8 @@ export default function SongSearch({ user }: SongSearchProps) {
                 />
             </div>
 
-            <SongList songs={filteredSongs} user={user} mutate={mutate} />
-            {searchTerm.trim() !== '' && <SongListSpotify songs={spotifySongs} user={user} allSongs={allSongs} loading={loadingSpotify} />}
+            <SongList songs={filteredSongs} user={user} />
+            {searchTerm.trim() !== '' && <SongListSpotify songs={spotifySongs} user={user} userLibrary={userLibrary} loading={loadingSpotify} />}
         </div>
     )
 }

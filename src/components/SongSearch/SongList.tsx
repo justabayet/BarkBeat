@@ -3,14 +3,14 @@ import { useState } from "react"
 import RatingModal from "../RatingModal"
 import { supabase } from "@/lib/supabase"
 import Pill, { getDifficultyString, pillConfig, PillKnown } from "../Pill"
+import { mutate } from "swr"
 
 interface SongListProps {
     songs: AugmentedUserSong[]
     user: { id: string }
-    mutate: () => void
 }
 
-export default function SongList({ songs, user, mutate }: SongListProps) {
+export default function SongList({ songs, user }: SongListProps) {
     const [selectedSong, setSelectedSong] = useState<AugmentedUserSong | null>(null)
     const [showRatingModal, setShowRatingModal] = useState(false)
 
@@ -23,8 +23,16 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
         if (!selectedSong || !selectedSong.songs?.id) return
 
         const fnAsync = async () => {
-
             if (!selectedSong || !selectedSong.songs?.id) return
+            const updateData: Partial<AugmentedUserSong> = {
+                difficulty_rating: data.difficulty,
+                mood_tags: data.moodTags,
+                language_override: data.language,
+                rating: data.rating
+            }
+            // Optimistically update the UI
+            mutate(`user-songs-${user.id}`, songs.map(s => s.songs?.id === selectedSong.songs?.id ? { ...s, ...updateData } : s), false);
+            // Update the database
             await supabase
                 .from('user_songs')
                 .update({
@@ -35,7 +43,7 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
                 })
                 .eq('user_id', user.id)
                 .eq('song_id', selectedSong.songs?.id)
-            mutate(); // Refresh the list after rating
+            mutate(`user-songs-${user.id}`);
         }
 
         setShowRatingModal(false)
@@ -50,12 +58,15 @@ export default function SongList({ songs, user, mutate }: SongListProps) {
 
     const handleDelete = async (song: AugmentedUserSong) => {
         if (!song.songs?.id) return;
+        mutate(`user-songs-${user.id}`, songs.filter(s => s.songs?.id !== song.songs?.id), false);
+
         await supabase
             .from('user_songs')
             .delete()
             .eq('user_id', user.id)
             .eq('song_id', song.songs.id);
-        mutate(); // Refresh the list after deletion
+
+        mutate(`user-songs-${user.id}`);
     }
     return (<>
         <div className="grid gap-6 p-4 pt-0">

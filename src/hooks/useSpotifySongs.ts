@@ -1,7 +1,7 @@
-import { SpotifyTrack } from "@/components/GlobalSearch";
 import { useState, useCallback, useEffect } from "react";
 import useDebounce from "./useDebounce";
 import useSWR from "swr";
+import { SpotifyTrack } from "@/components/SongSearch/SongListSpotify";
 
 export default function useSpotifySongs(searchTerm: string) {
     const [results, setResults] = useState<SpotifyTrack[]>([]);
